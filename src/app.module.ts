@@ -11,6 +11,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { AwsModule } from './aws/aws.module';
+import { ImageModule } from './image/image.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { AwsModule } from './aws/aws.module';
     AuthModule,
     CommonModule,
     AwsModule,
+    ImageModule,
   ],
   controllers: [AppController],
   providers: [
