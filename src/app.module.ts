@@ -25,7 +25,7 @@ import { ImageModule } from './image/image.module';
       serveRoot: '/public', //접두어
     }),
     ConfigModule.forRoot({
-      envFilePath: '.env',
+      envFilePath: `.env.${process.env.NODE_ENV}`,
       isGlobal: true,
     }),
     TypeOrmModule.forRoot({
