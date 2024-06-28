@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { ImageService } from './image.service';
 import { DiskImageInterceptor } from './interceptor/diskImage.interceptor';
-import { S3ImageInterceptor } from './interceptor/s3Image.interCeptor';
+import { S3ImageInterceptor } from './interceptor/s3Image.interceptor';
 import { AccessTokenGuard } from 'src/auth/guard/bear-token.guard';
 
 @UseGuards(AccessTokenGuard)
