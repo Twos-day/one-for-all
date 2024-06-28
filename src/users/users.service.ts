@@ -37,6 +37,10 @@ export class UsersService {
     return newUser;
   }
 
+  async getUserById(id: number) {
+    return this.usersRepository.findOne({ where: { id } });
+  }
+
   async getUserByEmail(email: string) {
     return this.usersRepository.findOne({ where: { email } });
   }

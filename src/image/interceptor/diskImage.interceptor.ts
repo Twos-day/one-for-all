@@ -12,6 +12,7 @@ import { extname } from 'path';
 import { tap } from 'rxjs/operators';
 import { v4 as uuid } from 'uuid';
 import { POSTS_FOLDER_PATH } from '../const/path.const';
+import { InjectRepository } from '@nestjs/typeorm';
 
 const multerOptions: multer.Options = {
   limits: {
@@ -41,10 +42,10 @@ const multerOptions: multer.Options = {
 
 @Injectable()
 export class DiskImageInterceptor implements NestInterceptor {
-  private readonly uploader: RequestHandler;
+  constructor() {}
 
-  constructor() {
-    this.uploader = multer(multerOptions).single('image');
+  get uploader(): RequestHandler {
+    return multer(multerOptions).single('image');
   }
 
   upload(request: any, response: any) {

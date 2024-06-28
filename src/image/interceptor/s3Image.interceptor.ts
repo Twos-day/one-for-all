@@ -15,6 +15,7 @@ import { extname } from 'path';
 import { tap } from 'rxjs/operators';
 import { AwsService } from 'src/aws/aws.service';
 import { v4 as uuid } from 'uuid';
+import { ImageService } from '../image.service';
 
 const multerOptions: multer.Options = {
   limits: {
@@ -38,6 +39,7 @@ export class S3ImageInterceptor implements NestInterceptor {
   constructor(
     private readonly configService: ConfigService,
     private readonly awsService: AwsService,
+    private readonly imageService: ImageService,
   ) {}
 
   get uploader(): RequestHandler {
@@ -65,6 +67,11 @@ export class S3ImageInterceptor implements NestInterceptor {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest();
     const response = ctx.getResponse();
+    const user = request.user;
+
+    if (!user) {
+      throw new BadRequestException('사용자 정보가 없습니다.');
+    }
 
     await this.upload(request, response);
 
@@ -72,10 +79,16 @@ export class S3ImageInterceptor implements NestInterceptor {
       throw new BadRequestException('이미지 파일이 없습니다.');
     }
 
-    return next
-      .handle()
-      .pipe(
-        tap(() => Logger.log('S3ImageInterceptor: S3-Bucket 이미지 저장성공')),
-      );
+    this.imageService.saveMetadata(user.id, request.file.key);
+
+    return next.handle().pipe(
+      tap(() =>
+        Logger.log(`
+            S3ImageInterceptor: S3-Bucket 이미지 저장성공
+            유저 이메일: ${user.email} 
+            이미지 키: ${request.file.key}
+            `),
+      ),
+    );
   }
 }
