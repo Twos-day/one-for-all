@@ -62,6 +62,10 @@ export class DiskImageInterceptor implements NestInterceptor {
 
     await this.upload(request, response);
 
+    if (!request.file) {
+      throw new BadRequestException('이미지 파일이 없습니다.');
+    }
+
     return next
       .handle()
       .pipe(

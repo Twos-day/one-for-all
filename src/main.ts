@@ -37,7 +37,7 @@ async function bootstrap() {
 
   const port = 8080;
   await app.listen(port, () => {
-    Logger.log(`🚀 서버가 실행되었습니다. 포트 : ${port}`);
+    Logger.log(`🚀 one_for_all 서버가 실행되었습니다. 포트 : ${port}`);
   });
 }
 bootstrap();
