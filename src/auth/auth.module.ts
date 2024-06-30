@@ -3,11 +3,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from 'src/users/users.module';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { PassportModule } from '@nestjs/passport';
+import { GoogleStrategy } from './strategy/google.strategy';
+import { KakaoStrategy } from './strategy/kakao.strategy';
 
 @Module({
-  imports: [JwtModule.register({}), UsersModule],
+  imports: [PassportModule, JwtModule.register({}), UsersModule],
+  providers: [AuthService, GoogleStrategy, KakaoStrategy],
   controllers: [AuthController],
-  providers: [AuthService],
   exports: [AuthService],
 })
 export class AuthModule {}

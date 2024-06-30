@@ -12,6 +12,7 @@ import { ConfigModule } from '@nestjs/config';
 import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { AwsModule } from './aws/aws.module';
 import { ImageModule } from './image/image.module';
+import { PassportModule } from '@nestjs/passport';
 
 @Module({
   imports: [
