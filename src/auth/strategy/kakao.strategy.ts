@@ -15,7 +15,6 @@ export class KakaoStrategy extends PassportStrategy(Strategy, 'kakao') {
     const protocol = configService.get('PROTOCOL');
     const host = configService.get('HOST');
     const callbackURL = `${protocol}://${host}/api/auth/callback/kakao`;
-    console.log('callbackURL', callbackURL);
     super({
       clientID: configService.get('KAKAO_CLIENT_ID'),
       clientSecret: configService.get('KAKAO_CLIENT_SECRET'),
