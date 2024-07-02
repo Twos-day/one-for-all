@@ -3,10 +3,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ImageModel } from './entity/image.entity';
 import { Repository } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
+import { AwsService } from 'src/aws/aws.service';
 
 @Injectable()
 export class ImageService {
   constructor(
+    private readonly awsService: AwsService,
     private readonly userService: UsersService,
     @InjectRepository(ImageModel)
     private readonly imageRepository: Repository<ImageModel>,
