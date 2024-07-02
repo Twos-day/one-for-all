@@ -14,12 +14,35 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { BasicTokenGuard } from './guard/basic-token.guard';
 import { RefreshTokenGuard } from './guard/bear-token.guard';
 import { AuthGuard } from '@nestjs/passport';
+import {
+  ApiOperation,
+  ApiTags,
+  ApiOkResponse,
+  ApiResponse,
+} from '@nestjs/swagger';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('token/access')
+  @ApiOperation({
+    summary: '엑세스 토큰 발급',
+    description: '리프레시 토큰을 이용하여 엑세스 토큰을 발급합니다.',
+  })
+  @ApiResponse({
+    status: 200,
+    schema: {
+      type: 'object',
+      properties: {
+        accessToken: {
+          type: 'string',
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+        },
+      },
+    },
+  })
   @UseGuards(RefreshTokenGuard)
   postTokenAccess(@Headers('authorization') rowToken: string) {
     const token = this.authService.extractTokenFromHeader(rowToken, true);

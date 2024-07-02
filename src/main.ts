@@ -4,10 +4,20 @@ import { AppFilter } from './app.filter';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './http-exception.filter';
 import { urlencoded, json } from 'express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const { httpAdapter } = app.get(HttpAdapterHost);
+
+  const options = new DocumentBuilder()
+    .setTitle('One For All API Docs')
+    .setDescription('One For All API Docs')
+    .setVersion('0.1.0')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, options);
+  SwaggerModule.setup('docs', app, document);
 
   // class validator dto 전역설정
   app.useGlobalPipes(
