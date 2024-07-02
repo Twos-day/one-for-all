@@ -15,6 +15,7 @@ import { S3ImageInterceptor } from './interceptor/s3Image.interceptor';
 import { AccessTokenGuard } from 'src/auth/guard/bear-token.guard';
 import { AwsService } from 'src/aws/aws.service';
 import { User } from 'src/users/decorator/user.decorator';
+import { ConfigService } from '@nestjs/config';
 
 @UseGuards(AccessTokenGuard)
 @Controller('image')
@@ -22,6 +23,7 @@ export class ImageController {
   constructor(
     private readonly awsService: AwsService,
     private readonly imageService: ImageService,
+    private readonly configService: ConfigService,
   ) {}
 
   // @Post('local')
@@ -48,9 +50,21 @@ export class ImageController {
       userId,
       fileName,
     );
-    Logger.log(
-      `사용자 ${email}에게 ${projectName} 프로젝트의 사진 업로드 URL 발급`,
-    );
+
+    const log = `사용자 ${email}에게 ${projectName} 프로젝트의 사진 업로드 URL 발급`;
+    Logger.log(log);
+
+    const res = await fetch(this.configService.get('DISCORD_WEBHOOK_URL'), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: log }),
+    });
+
+    if (!res.ok) {
+      Logger.error('디스코드 웹훅 전송 실패');
+      Logger.error(await res.text());
+    }
+
     return { url };
   }
 }
