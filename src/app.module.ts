@@ -1,4 +1,12 @@
-import { ClassSerializerInterceptor, Module } from '@nestjs/common';
+import {
+  BeforeApplicationShutdown,
+  ClassSerializerInterceptor,
+  Module,
+  OnApplicationBootstrap,
+  OnApplicationShutdown,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
@@ -13,6 +21,8 @@ import { PUBLIC_FOLDER_PATH } from './common/const/path.const';
 import { AwsModule } from './aws/aws.module';
 import { ImageModule } from './image/image.module';
 import { PassportModule } from '@nestjs/passport';
+import { LogModule } from './log/log.module';
+import { LogService } from './log/log.service';
 
 @Module({
   imports: [
@@ -45,6 +55,7 @@ import { PassportModule } from '@nestjs/passport';
     CommonModule,
     AwsModule,
     ImageModule,
+    LogModule,
   ],
   controllers: [AppController],
   providers: [
@@ -58,4 +69,31 @@ import { PassportModule } from '@nestjs/passport';
     },
   ],
 })
-export class AppModule {}
+export class AppModule
+  implements
+    OnApplicationBootstrap,
+    OnModuleInit,
+    OnModuleDestroy,
+    BeforeApplicationShutdown,
+    OnApplicationShutdown
+{
+  constructor(private readonly logService: LogService) {}
+
+  async onModuleInit() {}
+
+  async onApplicationBootstrap() {
+    if (process.env.NODE_ENV === 'prod') {
+      await this.logService.sendDiscode(`WAS 서버가 실행되었습니다.`);
+    }
+  }
+
+  async onModuleDestroy() {}
+
+  async beforeApplicationShutdown(signal?: string) {
+    if (process.env.NODE_ENV === 'prod') {
+      await this.logService.sendDiscode(`WAS 서버가 종료됩니다.`);
+    }
+  }
+
+  async onApplicationShutdown(signal?: string) {}
+}

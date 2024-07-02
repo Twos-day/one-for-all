@@ -81,14 +81,14 @@ export class S3ImageInterceptor implements NestInterceptor {
 
     this.imageService.saveMetadata(user.id, request.file.key);
 
-    return next.handle().pipe(
-      tap(() =>
-        Logger.log(`
-            S3ImageInterceptor: S3-Bucket 이미지 저장성공
-            유저 이메일: ${user.email} 
-            이미지 키: ${request.file.key}
-            `),
-      ),
-    );
+    return next
+      .handle()
+      .pipe(
+        tap(() =>
+          Logger.log(
+            `S3ImageInterceptor: S3-Bucket 이미지 저장성공. 유저 이메일: ${user.email}, 이미지 키: ${request.file.key}`,
+          ),
+        ),
+      );
   }
 }

@@ -35,13 +35,13 @@ async function bootstrap() {
     credentials: true,
   });
 
+  // app.enableShutdownHooks();
+
   const port = 8080;
-  await app.listen(port, () => {
-    Logger.log(`
-      🚀 one_for_all 서버가 실행되었습니다. 🚀 
-      포트 : ${port} 
-      ENV  : ${process.env.NODE_ENV}
-    `);
+  await app.listen(port, async () => {
+    Logger.log(
+      `🚀 one_for_all 서버가 실행되었습니다. 🚀 포트 : ${port}, ENV : ${process.env.NODE_ENV}`,
+    );
   });
 }
 bootstrap();
