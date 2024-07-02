@@ -1,12 +1,12 @@
 import { IsString } from 'class-validator';
 import { BaseModel } from 'src/common/entity/base.entity';
-import { UsersModel } from 'src/users/entities/users.entity';
+import { UserModel } from 'src/user/entities/user.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity()
 export class ImageModel extends BaseModel {
-  @ManyToOne(() => UsersModel, (user) => user.images, { nullable: false })
-  user: UsersModel;
+  @ManyToOne(() => UserModel, (user) => user.images, { nullable: false })
+  user: UserModel;
 
   @IsString()
   @Column()

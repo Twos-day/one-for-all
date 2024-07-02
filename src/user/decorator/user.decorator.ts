@@ -3,12 +3,12 @@ import {
   InternalServerErrorException,
   createParamDecorator,
 } from '@nestjs/common';
-import { UsersModel } from '../entities/users.entity';
+import { UserModel } from '../entities/user.entity';
 
 export const User = createParamDecorator(
-  (data: keyof UsersModel | undefined, context: ExecutionContext) => {
+  (data: keyof UserModel | undefined, context: ExecutionContext) => {
     const req = context.switchToHttp().getRequest();
-    const user: UsersModel = req.user;
+    const user: UserModel = req.user;
 
     if (!user) {
       throw new InternalServerErrorException(

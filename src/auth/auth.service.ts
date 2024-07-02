@@ -1,8 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bycrypt from 'bcrypt';
-import { UsersModel } from 'src/users/entities/users.entity';
-import { UsersService } from 'src/users/users.service';
+import { UserModel } from 'src/user/entities/user.entity';
+import { UserService as UserService } from 'src/user/user.service';
 import { TokensEnum } from './const/tokens.const';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { ConfigService } from '@nestjs/config';
@@ -21,7 +21,7 @@ type PayLoad = {
 export class AuthService {
   constructor(
     private readonly jwrService: JwtService,
-    private readonly userService: UsersService,
+    private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {}
 
@@ -49,7 +49,7 @@ export class AuthService {
     return { email, password };
   }
 
-  loginUser(user: Pick<UsersModel, 'email' | 'id'>) {
+  loginUser(user: Pick<UserModel, 'email' | 'id'>) {
     return {
       accessToken: this.signToken(user, false),
       refreshToken: this.signToken(user, true),
@@ -57,7 +57,7 @@ export class AuthService {
   }
 
   async authenticateWithEmailAndPassword(
-    user: Pick<UsersModel, 'email' | 'password'>,
+    user: Pick<UserModel, 'email' | 'password'>,
   ) {
     const existingUser = await this.userService.getUserByEmail(user.email);
 
@@ -74,7 +74,7 @@ export class AuthService {
     return existingUser;
   }
 
-  signToken(user: Pick<UsersModel, 'email' | 'id'>, isRefreshToken: boolean) {
+  signToken(user: Pick<UserModel, 'email' | 'id'>, isRefreshToken: boolean) {
     const payload: PayLoad = {
       sub: user.id,
       email: user.email,
@@ -126,7 +126,7 @@ export class AuthService {
   }
 
   //로그인
-  async loginWithEmail(user: Pick<UsersModel, 'email' | 'password'>) {
+  async loginWithEmail(user: Pick<UserModel, 'email' | 'password'>) {
     const existingUser = await this.authenticateWithEmailAndPassword(user);
 
     return this.loginUser(existingUser);

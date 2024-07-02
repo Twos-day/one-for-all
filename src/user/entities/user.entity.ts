@@ -1,15 +1,16 @@
+import { BaseModel } from '@/common/entity/base.entity';
+import { emailValidationMessage } from '@/common/validator/message/email.message';
+import { lenghthValidationMessage } from '@/common/validator/message/length.message';
+import { stringValidationMessage } from '@/common/validator/message/string.message';
+import { ImageModel } from '@/image/entity/image.entity';
+import { PostModel } from '@/twosday/post/entity/post.entity';
+import { PostModel as PostModel2 } from '@/dummyPrj/post/entity/post.entity';
 import { Exclude } from 'class-transformer';
 import { IsEmail, IsInt, IsString, Length, Max, Min } from 'class-validator';
-import { BaseModel } from 'src/common/entity/base.entity';
-import { emailValidationMessage } from 'src/common/validator/message/email.message';
-import { lenghthValidationMessage } from 'src/common/validator/message/length.message';
-import { stringValidationMessage } from 'src/common/validator/message/string.message';
-import { ImageModel } from 'src/image/entity/image.entity';
-import { PostsModel } from 'src/posts/entities/posts.entity';
 import { Column, Entity, OneToMany } from 'typeorm';
 
 @Entity()
-export class UsersModel extends BaseModel {
+export class UserModel extends BaseModel {
   @IsString({ message: stringValidationMessage })
   @Length(1, 20, { message: lenghthValidationMessage })
   @Column({ length: 20 })
@@ -27,12 +28,15 @@ export class UsersModel extends BaseModel {
 
   @IsInt()
   @Min(1)
-  @Max(100)
+  @Max(5)
   @Column({ default: 1 })
   level: number;
 
-  @OneToMany(() => PostsModel, (post) => post.author)
-  posts: PostsModel[];
+  @OneToMany(() => PostModel, (post) => post.author)
+  posts: PostModel[];
+
+  @OneToMany(() => PostModel2, (post) => post.author)
+  post2s: PostModel2[];
 
   @OneToMany(() => ImageModel, (image) => image.user)
   images: ImageModel[];

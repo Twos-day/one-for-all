@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, VerifyCallback } from 'passport-google-oauth20';
-import { UsersService } from 'src/users/users.service';
+import { UserService } from 'src/user/user.service';
 import { AuthService } from '../auth.service';
 import { ConfigService } from '@nestjs/config';
 
@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config';
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     private readonly authService: AuthService,
-    private readonly userService: UsersService,
+    private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {
     const protocol = configService.get('PROTOCOL');

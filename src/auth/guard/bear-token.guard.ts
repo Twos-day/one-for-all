@@ -5,14 +5,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from '../auth.service';
-import { UsersService } from 'src/users/users.service';
+import { UserService } from 'src/user/user.service';
 import { TokensEnum } from '../const/tokens.const';
 
 @Injectable()
 class BearTokenGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
-    private readonly usersService: UsersService,
+    private readonly usersService: UserService,
   ) {}
 
   async canActivate(context: ExecutionContext) {

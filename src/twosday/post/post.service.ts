@@ -7,14 +7,13 @@ import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PostsModel } from './entities/posts.entity';
+import { PostModel } from './entity/post.entity';
 
-// service는 비즈니스 로직을 처리하는 역할
 @Injectable()
-export class PostsService {
+export class PostService {
   constructor(
-    @InjectRepository(PostsModel)
-    private readonly postsRepository: Repository<PostsModel>,
+    @InjectRepository(PostModel)
+    private readonly postsRepository: Repository<PostModel>,
     private readonly configService: ConfigService,
     private readonly commonService: CommonService,
   ) {}

@@ -14,7 +14,7 @@ import { DiskImageInterceptor } from './interceptor/diskImage.interceptor';
 import { S3ImageInterceptor } from './interceptor/s3Image.interceptor';
 import { AccessTokenGuard } from 'src/auth/guard/bear-token.guard';
 import { AwsService } from 'src/aws/aws.service';
-import { User } from 'src/users/decorator/user.decorator';
+import { User } from 'src/user/decorator/user.decorator';
 import { ConfigService } from '@nestjs/config';
 import { LogService } from 'src/log/log.service';
 

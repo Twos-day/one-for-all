@@ -7,8 +7,8 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { User } from 'src/users/decorator/user.decorator';
-import { UsersModel } from 'src/users/entities/users.entity';
+import { User } from 'src/user/decorator/user.decorator';
+import { UserModel } from 'src/user/entities/user.entity';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { BasicTokenGuard } from './guard/basic-token.guard';
@@ -37,7 +37,7 @@ export class AuthController {
 
   @Post('login/email')
   @UseGuards(BasicTokenGuard)
-  postLoginEmail(@User() user: UsersModel) {
+  postLoginEmail(@User() user: UserModel) {
     return this.authService.loginUser(user);
   }
 

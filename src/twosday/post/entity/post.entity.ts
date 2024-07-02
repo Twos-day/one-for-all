@@ -2,15 +2,15 @@ import { Transform } from 'class-transformer';
 import { IsString } from 'class-validator';
 import { BaseModel } from 'src/common/entity/base.entity';
 import { stringValidationMessage } from 'src/common/validator/message/string.message';
-import { UsersModel } from 'src/users/entities/users.entity';
+import { UserModel } from 'src/user/entities/user.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
-@Entity()
-export class PostsModel extends BaseModel {
+@Entity('twosday_post_model')
+export class PostModel extends BaseModel {
   // usersModel과 연결
   // null이 될 수 없다.
-  @ManyToOne(() => UsersModel, (user) => user.posts, { nullable: false })
-  author: UsersModel;
+  @ManyToOne(() => UserModel, (user) => user.posts, { nullable: false })
+  author: UserModel;
 
   @Column()
   @IsString({ message: stringValidationMessage })

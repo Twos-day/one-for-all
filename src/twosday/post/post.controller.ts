@@ -13,18 +13,17 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { PostsService } from './posts.service';
+import { PostService } from './post.service';
 import { AccessTokenGuard } from 'src/auth/guard/bear-token.guard';
-import { User } from 'src/users/decorator/user.decorator';
+import { User } from 'src/user/decorator/user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-// controller 요청을 받는 역할, 라우팅
-@Controller('posts')
-export class PostsController {
-  constructor(private readonly postsService: PostsService) {}
+@Controller('post')
+export class PostController {
+  constructor(private readonly postsService: PostService) {}
 
   @Get()
   getPosts(@Query() postDto: PaginatePostDto) {
