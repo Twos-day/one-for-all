@@ -32,7 +32,7 @@ async function bootstrap() {
   );
 
   // '/api' 경로로 들어오는 요청에 대한 전역 접두사 설정
-  app.setGlobalPrefix('api');
+  // app.setGlobalPrefix('api');
   app.useGlobalFilters(new AppFilter(httpAdapter), new HttpExceptionFilter());
 
   app.use(json({ limit: '500mb' }));

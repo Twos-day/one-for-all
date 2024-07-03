@@ -9,7 +9,7 @@ import { UserService } from 'src/user/user.service';
 import { TokensEnum } from '../const/tokens.const';
 
 @Injectable()
-class BearTokenGuard implements CanActivate {
+export class BearTokenGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UserService,

@@ -7,29 +7,26 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { User } from 'src/user/decorator/user.decorator';
-import { UserModel } from 'src/user/entities/user.entity';
+import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from '@nestjs/passport';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { BasicTokenGuard } from './guard/basic-token.guard';
 import { RefreshTokenGuard } from './guard/bear-token.guard';
-import { AuthGuard } from '@nestjs/passport';
-import {
-  ApiOperation,
-  ApiTags,
-  ApiOkResponse,
-  ApiResponse,
-} from '@nestjs/swagger';
 
 @ApiTags('Auth')
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
+  ) {}
 
-  @Post('token/access')
+  @Post('session')
   @ApiOperation({
-    summary: '엑세스 토큰 발급',
-    description: '리프레시 토큰을 이용하여 엑세스 토큰을 발급합니다.',
+    summary: '세션 조회',
+    description: '리프레시 토큰을 이용하여 세션을 반환합니다.',
   })
   @ApiResponse({
     status: 200,
@@ -44,29 +41,50 @@ export class AuthController {
     },
   })
   @UseGuards(RefreshTokenGuard)
-  postTokenAccess(@Headers('authorization') rowToken: string) {
+  async postSession(@Headers('authorization') rowToken: string) {
     const token = this.authService.extractTokenFromHeader(rowToken, true);
-    const newToken = this.authService.rotateToken(token, false);
-    return { accessToken: newToken };
+    const session = await this.authService.getSessionUser(token);
+    return session;
   }
 
-  @Post('token/refresh')
-  @UseGuards(RefreshTokenGuard)
-  postTokenRefresh(@Headers('authorization') rowToken: string) {
-    const token = this.authService.extractTokenFromHeader(rowToken, true);
-    const newToken = this.authService.rotateToken(token, true);
-    return { refreshToken: newToken };
+  // @Post('token/refresh')
+  // @UseGuards(RefreshTokenGuard)
+  // postTokenRefresh(@Headers('authorization') rowToken: string) {
+  //   const token = this.authService.extractTokenFromHeader(rowToken, true);
+  //   const newToken = this.authService.rotateToken(token, true);
+  //   return { refreshToken: newToken };
+  // }
+
+  @Post('email')
+  async postLoginEmail(
+    @Body('email') email: string,
+    @Body('password') password: string,
+    @Req() req: Request,
+  ) {
+    const user = await this.authService.authenticateWithEmailAndPassword({
+      email,
+      password,
+    });
+    const refreshToken = this.authService.signToken(user, true);
+
+    console.log('cookies', req.cookies);
+
+    req.res.status(200);
+
+    req.res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      path: '/',
+      sameSite: 'strict',
+      secure: this.configService.get('PROTOCAL') === 'https',
+    });
+
+    return { message: 'ok' };
   }
 
-  @Post('login/email')
-  @UseGuards(BasicTokenGuard)
-  postLoginEmail(@User() user: UserModel) {
-    return this.authService.loginUser(user);
-  }
-
-  @Post('register/email')
-  postRegisterEmail(@Body() userDto: RegisterUserDto) {
-    return this.authService.registerWithEmail(userDto);
+  @Post('register')
+  async postRegisterEmail(@Body() userDto: RegisterUserDto) {
+    await this.authService.registerWithEmail(userDto);
+    return { message: 'ok' };
   }
 
   @Get('google')

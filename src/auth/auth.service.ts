@@ -131,4 +131,24 @@ export class AuthService {
 
     return this.loginUser(existingUser);
   }
+
+  async getSessionUser(token: string) {
+    const decoded = this.verifyToken(token);
+    const user = await this.userService.getUserByEmail(decoded.email);
+
+    const session = {
+      id: user.id,
+      email: user.email,
+      nickname: user.nickname,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+
+    const accessToken = this.jwrService.sign(session, {
+      secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
+      expiresIn: 3600, //초단위
+    });
+
+    return { ...session, accessToken };
+  }
 }
