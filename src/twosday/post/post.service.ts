@@ -7,13 +7,13 @@ import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PostModel } from './entity/post.entity';
+import { TwosdayPostModel } from './entity/post.entity';
 
 @Injectable()
 export class PostService {
   constructor(
-    @InjectRepository(PostModel)
-    private readonly postsRepository: Repository<PostModel>,
+    @InjectRepository(TwosdayPostModel)
+    private readonly postsRepository: Repository<TwosdayPostModel>,
     private readonly configService: ConfigService,
     private readonly commonService: CommonService,
   ) {}

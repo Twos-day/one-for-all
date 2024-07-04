@@ -7,6 +7,7 @@ import {
 import { AuthService } from '../auth.service';
 import { UserService } from 'src/user/user.service';
 import { TokensEnum } from '../const/tokens.const';
+import { Request } from 'express';
 
 @Injectable()
 export class BearTokenGuard implements CanActivate {
@@ -18,21 +19,15 @@ export class BearTokenGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
 
-    const rawToken = req.headers.authorization;
+    const token = this.authService.extractTokenFromReq(req);
 
-    if (!rawToken) {
-      throw new UnauthorizedException('토큰이 없습니다.');
-    }
+    // const result = this.authService.verifyToken(token);
 
-    const token = this.authService.extractTokenFromHeader(rawToken, true);
-
-    const result = this.authService.verifyToken(token);
-
-    const user = await this.usersService.getUserByEmail(result.email);
+    // const user = await this.usersService.getUserByEmail(result.email);
 
     req.token = token;
-    req.type = result.type;
-    req.user = user;
+    // req.type = result.type;
+    // req.user = user;
 
     return true;
   }

@@ -6,7 +6,7 @@ import { UserModel } from 'src/user/entities/user.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity('twosday_post_model')
-export class PostModel extends BaseModel {
+export class TwosdayPostModel extends BaseModel {
   // usersModel과 연결
   // null이 될 수 없다.
   @ManyToOne(() => UserModel, (user) => user.posts, { nullable: false })

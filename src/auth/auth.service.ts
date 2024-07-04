@@ -12,9 +12,8 @@ import {
 } from './const/env-keys.const';
 
 type PayLoad = {
-  sub: number;
+  id: number;
   email: string;
-  type: TokensEnum;
 };
 
 @Injectable()
@@ -25,17 +24,20 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  extractTokenFromHeader(header: string, isBearer: boolean) {
-    const [type, token] = header.split(' ');
-    const prefix = isBearer ? 'Bearer' : 'Basic';
+  extractTokenFromReq(req: any) {
+    const rawToken: string | undefined = req.headers.authorization;
 
-    const isValidate = type && token && prefix === type;
-
-    if (!isValidate) {
-      throw new UnauthorizedException('잘못된 토큰입니다.');
+    if (!rawToken) {
+      throw new UnauthorizedException('토큰이 없습니다.');
     }
 
-    return token;
+    const [type, token] = rawToken.split(' ');
+
+    if (type === 'Bearer' && token) {
+      return token;
+    }
+
+    throw new UnauthorizedException('잘못된 토큰입니다.');
   }
 
   decodeBasicToken(token: string) {
@@ -47,13 +49,6 @@ export class AuthService {
     }
 
     return { email, password };
-  }
-
-  loginUser(user: Pick<UserModel, 'email' | 'id'>) {
-    return {
-      accessToken: this.signToken(user, false),
-      refreshToken: this.signToken(user, true),
-    };
   }
 
   async authenticateWithEmailAndPassword(
@@ -74,69 +69,51 @@ export class AuthService {
     return existingUser;
   }
 
-  signToken(user: Pick<UserModel, 'email' | 'id'>, isRefreshToken: boolean) {
-    const payload: PayLoad = {
-      sub: user.id,
-      email: user.email,
-      type: isRefreshToken ? TokensEnum.REFRESH : TokensEnum.ACCESS,
-    };
-
-    return this.jwrService.sign(payload, {
-      secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
-      expiresIn: isRefreshToken ? 3600 * 6 : 3600, //초단위
-    });
-  }
-
-  verifyToken(token: string) {
+  verifyToken(token: string, isRefresh: boolean) {
     try {
       return this.jwrService.verify<PayLoad>(token, {
-        secret: this.configService.get('JWT_SECRET'),
+        secret: this.configService.get(
+          isRefresh ? 'REFRESH_SECRET' : 'ACCESS_SECRET',
+        ),
       });
     } catch (e) {
       throw new UnauthorizedException('토큰이 만료되거나 잘못되었습니다.');
     }
   }
 
-  rotateToken(token: string, isRefreshToken: boolean) {
-    const decoded = this.jwrService.verify<PayLoad>(token, {
-      secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
-    });
+  // async registerWithEmail(userDto: RegisterUserDto) {
+  //   const hash = await bycrypt.hash(
+  //     userDto.password,
+  //     Number(this.configService.get<string>(ENV_HASH_ROUNDS_KEY)),
+  //   );
 
-    if (decoded.type !== TokensEnum.REFRESH) {
-      throw new UnauthorizedException('리프레시 토큰이 아닙니다.');
-    }
+  //   const newUser = await this.userService.createUser({
+  //     ...userDto,
+  //     password: hash,
+  //   });
+  // }
 
-    return this.signToken(
-      { id: decoded.sub, email: decoded.email },
-      isRefreshToken,
-    );
-  }
-
-  //회원가입 후 바로 로그인
-  async registerWithEmail(userDto: RegisterUserDto) {
-    const hash = await bycrypt.hash(
-      userDto.password,
-      Number(this.configService.get<string>(ENV_HASH_ROUNDS_KEY)),
-    );
-    const newUser = await this.userService.createUser({
-      ...userDto,
-      password: hash,
-    });
-    return this.loginUser(newUser);
-  }
-
-  //로그인
   async loginWithEmail(user: Pick<UserModel, 'email' | 'password'>) {
     const existingUser = await this.authenticateWithEmailAndPassword(user);
 
-    return this.loginUser(existingUser);
+    const payload = {
+      id: existingUser.id,
+      email: existingUser.email,
+    };
+
+    const refreshToken = this.jwrService.sign(payload, {
+      secret: this.configService.get<string>('REFRESH_SECRET'),
+      expiresIn: 60 * 60 * 24 * 3, //초단위
+    });
+
+    return refreshToken;
   }
 
   async getSessionUser(token: string) {
-    const decoded = this.verifyToken(token);
+    const decoded = this.verifyToken(token, true);
     const user = await this.userService.getUserByEmail(decoded.email);
 
-    const session = {
+    const session: Session = {
       id: user.id,
       email: user.email,
       nickname: user.nickname,
@@ -145,8 +122,8 @@ export class AuthService {
     };
 
     const accessToken = this.jwrService.sign(session, {
-      secret: this.configService.get<string>(ENV_JWT_SECRET_KEY),
-      expiresIn: 3600, //초단위
+      secret: this.configService.get<string>('ACCESS_SECRET'),
+      expiresIn: 60 * 60, //초단위
     });
 
     return { ...session, accessToken };

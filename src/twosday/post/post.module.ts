@@ -4,7 +4,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { AwsModule } from 'src/aws/aws.module';
 import { CommonModule } from 'src/common/common.module';
 import { UserModule } from 'src/user/user.module';
-import { PostModel } from './entity/post.entity';
+import { TwosdayPostModel } from './entity/post.entity';
 import { PostService } from './post.service';
 
 @Module({
@@ -13,7 +13,7 @@ import { PostService } from './post.service';
     UserModule,
     CommonModule,
     AwsModule,
-    TypeOrmModule.forFeature([PostModel]),
+    TypeOrmModule.forFeature([TwosdayPostModel]),
   ],
   providers: [PostService],
   exports: [PostService],

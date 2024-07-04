@@ -1,9 +1,10 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
+import { MailService } from '@/mail/mail.service';
 
-@Controller('user')
+@Controller('api/user')
 export class UserController {
-  constructor(private readonly usersService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   // @Get()
   // getAllUsers() {

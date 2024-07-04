@@ -6,9 +6,10 @@ import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { GoogleStrategy } from './strategy/google.strategy';
 import { KakaoStrategy } from './strategy/kakao.strategy';
+import { MailModule } from '@/mail/mail.module';
 
 @Module({
-  imports: [PassportModule, JwtModule.register({}), UserModule],
+  imports: [PassportModule, JwtModule.register({}), UserModule, MailModule],
   providers: [AuthService, GoogleStrategy, KakaoStrategy],
   controllers: [AuthController],
   exports: [AuthService],

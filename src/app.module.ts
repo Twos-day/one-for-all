@@ -22,6 +22,7 @@ import { ImageModule } from './image/image.module';
 import { LogModule } from './log/log.module';
 import { LogService } from './log/log.service';
 import { TwosdayModule } from './twosday/twosday.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { TwosdayModule } from './twosday/twosday.module';
     AwsModule,
     ImageModule,
     LogModule,
+    MailModule,
     TwosdayModule,
   ],
   controllers: [AppController],
