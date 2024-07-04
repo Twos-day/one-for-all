@@ -10,7 +10,7 @@ import { TokensEnum } from '../const/tokens.const';
 import { Request } from 'express';
 
 @Injectable()
-export class BearTokenGuard implements CanActivate {
+export class AccessTokenGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UserService,
@@ -18,47 +18,27 @@ export class BearTokenGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
-
-    const token = this.authService.extractTokenFromReq(req);
-
-    // const result = this.authService.verifyToken(token);
-
-    // const user = await this.usersService.getUserByEmail(result.email);
-
-    req.token = token;
-    // req.type = result.type;
-    // req.user = user;
-
+    const token = this.authService.extractTokenFromReq(req, true);
+    const { id, email } = this.authService.verifyToken(token, false);
+    const user = await this.usersService.getUserById(id);
+    req.user = user;
     return true;
   }
 }
 
 @Injectable()
-export class AccessTokenGuard extends BearTokenGuard {
+export class RefreshTokenGuard implements CanActivate {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly usersService: UserService,
+  ) {}
+
   async canActivate(context: ExecutionContext) {
-    await super.canActivate(context);
-
     const req = context.switchToHttp().getRequest();
-
-    if (req.type !== TokensEnum.ACCESS) {
-      throw new UnauthorizedException('Access Token이 아닙니다.');
-    }
-
-    return true;
-  }
-}
-
-@Injectable()
-export class RefreshTokenGuard extends BearTokenGuard {
-  async canActivate(context: ExecutionContext) {
-    await super.canActivate(context);
-
-    const req = context.switchToHttp().getRequest();
-
-    if (req.type !== TokensEnum.REFRESH) {
-      throw new UnauthorizedException('Refresh Token이 아닙니다.');
-    }
-
+    const token = this.authService.extractTokenFromReq(req, true);
+    const { id, email } = this.authService.verifyToken(token, true);
+    const user = await this.usersService.getUserById(id);
+    req.user = user;
     return true;
   }
 }

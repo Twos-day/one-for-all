@@ -5,17 +5,20 @@ import { Exclude } from 'class-transformer';
 import { IsEmail, IsString, Length, IsOptional } from 'class-validator';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { StatusEnum } from '../const/status.const';
+import { ApiProperty } from '@nestjs/swagger';
 
 @Entity()
 export class UserModel extends BaseModel {
   @IsString()
   @Length(1, 20)
   @Column({ length: 20 })
+  @ApiProperty()
   nickname: string;
 
   @IsString()
   @IsEmail()
   @Column({ unique: true })
+  @ApiProperty({ example: 'example@naver.com' })
   email: string;
 
   @IsString()
@@ -27,9 +30,11 @@ export class UserModel extends BaseModel {
   @IsString()
   @IsOptional()
   @Column({ nullable: true })
+  @ApiProperty()
   avatar: string | null;
 
   @Column()
+  @ApiProperty()
   isSocial: boolean;
 
   @Length(6)
@@ -44,12 +49,14 @@ export class UserModel extends BaseModel {
   expiresAt: Date;
 
   @Column({ type: 'enum', enum: StatusEnum })
+  @ApiProperty()
   status: StatusEnum;
 
   @Column({ nullable: true })
   loginAt: Date;
 
   @Column({ default: 1 })
+  @ApiProperty()
   level: number;
 
   @OneToMany(() => TwosdayPostModel, (post) => post.author)

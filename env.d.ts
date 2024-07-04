@@ -31,6 +31,10 @@ declare global {
 
       // LOG
       readonly DISCORD_WEBHOOK_URL: string;
+
+      // MAIL
+      readonly NAVER_USER: string;
+      readonly NAVER_PASSWORD: string;
     }
   }
 }

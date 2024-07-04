@@ -1,15 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bycrypt from 'bcrypt';
 import { UserModel } from 'src/user/entities/user.entity';
-import { UserService as UserService } from 'src/user/user.service';
-import { TokensEnum } from './const/tokens.const';
-import { RegisterUserDto } from './dto/register-user.dto';
-import { ConfigService } from '@nestjs/config';
-import {
-  ENV_HASH_ROUNDS_KEY,
-  ENV_JWT_SECRET_KEY,
-} from './const/env-keys.const';
+import { UserService } from 'src/user/user.service';
 
 type PayLoad = {
   id: number;
@@ -24,20 +18,23 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  extractTokenFromReq(req: any) {
-    const rawToken: string | undefined = req.headers.authorization;
+  extractTokenFromReq(req: any, isBearer: boolean) {
+    const rawToken = req.headers.authorization;
 
     if (!rawToken) {
       throw new UnauthorizedException('토큰이 없습니다.');
     }
 
     const [type, token] = rawToken.split(' ');
+    const prefix = isBearer ? 'Bearer' : 'Basic';
 
-    if (type === 'Bearer' && token) {
-      return token;
+    const isValidate = type && token && prefix === type;
+
+    if (!isValidate) {
+      throw new UnauthorizedException('잘못된 토큰입니다.');
     }
 
-    throw new UnauthorizedException('잘못된 토큰입니다.');
+    return token;
   }
 
   decodeBasicToken(token: string) {
@@ -81,24 +78,10 @@ export class AuthService {
     }
   }
 
-  // async registerWithEmail(userDto: RegisterUserDto) {
-  //   const hash = await bycrypt.hash(
-  //     userDto.password,
-  //     Number(this.configService.get<string>(ENV_HASH_ROUNDS_KEY)),
-  //   );
-
-  //   const newUser = await this.userService.createUser({
-  //     ...userDto,
-  //     password: hash,
-  //   });
-  // }
-
-  async loginWithEmail(user: Pick<UserModel, 'email' | 'password'>) {
-    const existingUser = await this.authenticateWithEmailAndPassword(user);
-
+  createRefreshToken(user: UserModel) {
     const payload = {
-      id: existingUser.id,
-      email: existingUser.email,
+      id: user.id,
+      email: user.email,
     };
 
     const refreshToken = this.jwrService.sign(payload, {
@@ -109,10 +92,7 @@ export class AuthService {
     return refreshToken;
   }
 
-  async getSessionUser(token: string) {
-    const decoded = this.verifyToken(token, true);
-    const user = await this.userService.getUserByEmail(decoded.email);
-
+  async createSession(user: UserModel) {
     const session: Session = {
       id: user.id,
       email: user.email,

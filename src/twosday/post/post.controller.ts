@@ -1,3 +1,4 @@
+import { AccessTokenGuard } from '@/auth/guard/bear-token.guard';
 import {
   Body,
   Controller,
@@ -13,13 +14,12 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { PostService } from './post.service';
-import { AccessTokenGuard } from 'src/auth/guard/bear-token.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from 'src/user/decorator/user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { UpdatePostDto } from './dto/update-post.dto';
+import { PostService } from './post.service';
 
 @Controller('post')
 export class PostController {

@@ -4,7 +4,7 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
-import { AuthService } from '../src/auth/auth.service';
+import { AuthService } from '../auth.service';
 
 @Injectable()
 export class BasicTokenGuard implements CanActivate {
@@ -13,13 +13,8 @@ export class BasicTokenGuard implements CanActivate {
   /** 통과할 수 있는지 없는지에 대한 함수 */
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
-    const rawToken = req.headers.authorization;
 
-    if (!rawToken) {
-      throw new UnauthorizedException('토큰이 없습니다.');
-    }
-
-    const token = this.authService.extractTokenFromReq(rawToken, false);
+    const token = this.authService.extractTokenFromReq(req, false);
 
     const payload = this.authService.decodeBasicToken(token);
 
