@@ -1,9 +1,11 @@
+import { TwosdayTagModel } from '@/twosday/tag/entity/tag.entity';
+import { Optional } from '@nestjs/common';
 import { Transform } from 'class-transformer';
-import { IsString } from 'class-validator';
+import { IsArray, IsBoolean, IsOptional, IsString } from 'class-validator';
 import { BaseModel } from 'src/common/entity/base.entity';
 import { stringValidationMessage } from 'src/common/validator/message/string.message';
 import { UserModel } from 'src/user/entities/user.entity';
-import { Column, Entity, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne } from 'typeorm';
 
 @Entity('twosday_post_model')
 export class TwosdayPostModel extends BaseModel {
@@ -12,23 +14,22 @@ export class TwosdayPostModel extends BaseModel {
   @ManyToOne(() => UserModel, (user) => user.posts, { nullable: false })
   author: UserModel;
 
-  @Column()
-  @IsString({ message: stringValidationMessage })
+  @IsArray()
+  @IsString({ each: true })
+  @ManyToMany(() => TwosdayTagModel, (tag) => tag.posts, { cascade: true })
+  @JoinTable()
+  tags: TwosdayTagModel[];
+
+  @Column({ type: 'varchar', length: 255 })
+  @IsString()
   title: string;
 
-  @Column()
-  @IsString({ message: stringValidationMessage })
+  @Column('text')
+  @IsString()
   content: string;
 
-  @Column({
-    nullable: true,
-  })
-  @Transform(({ value }) => value && `/public/posts/${value}`)
-  image?: string;
-
-  @Column({ default: 0 })
-  likeCount: number;
-
-  @Column({ default: 0 })
-  commentCount: number;
+  @Column({ default: false })
+  @IsOptional()
+  @IsBoolean()
+  isPublic: boolean;
 }

@@ -15,9 +15,9 @@ export class UserService {
     private readonly usersRepository: Repository<UserModel>,
   ) {}
 
-  // async getUserById(id: number) {
-  //   return this.usersRepository.findOne({ where: { id } });
-  // }
+  async getUserById(id: number) {
+    return this.usersRepository.findOne({ where: { id } });
+  }
 
   async getUserByEmail(email: string) {
     return this.usersRepository.findOne({ where: { email } });
@@ -105,5 +105,11 @@ export class UserService {
     }
 
     return isExist;
+  }
+
+  async updateLoginAt(id: number) {
+    return await this.usersRepository.update(id, {
+      loginAt: () => 'CURRENT_TIMESTAMP',
+    });
   }
 }

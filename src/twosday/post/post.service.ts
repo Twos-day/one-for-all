@@ -10,7 +10,7 @@ import { UpdatePostDto } from './dto/update-post.dto';
 import { TwosdayPostModel } from './entity/post.entity';
 
 @Injectable()
-export class PostService {
+export class TwosdayPostService {
   constructor(
     @InjectRepository(TwosdayPostModel)
     private readonly postsRepository: Repository<TwosdayPostModel>,
@@ -20,40 +20,15 @@ export class PostService {
 
   async getAllPosts() {
     return this.postsRepository.find({
-      relations: ['author'],
-    });
-  }
-
-  async generatePosts(userId: number) {
-    for (let i = 0; i < 100; i++) {
-      await this.createPost(userId, {
-        title: `임의로 생성된 포스트 제목 ${i}`,
-        content: `임의로 생성된 포스트 내용 ${i}`,
-      });
-    }
-
-    return true;
-  }
-
-  async paginatePosts(postDto: PaginatePostDto) {
-    const protocol = this.configService.get(ENV_PROTOCOL_KEY);
-    const host = this.configService.get(ENV_HOST_KEY);
-    const baseUrl = `${protocol}://${host}/api/posts`;
-
-    return this.commonService.paginate(
-      postDto,
-      this.postsRepository,
-      {
-        relations: ['author'],
-        select: {
-          author: {
-            email: true,
-            id: true,
-          },
+      relations: ['author', 'tags'],
+      select: {
+        author: {
+          email: true,
+          avatar: true,
+          nickname: true,
         },
       },
-      baseUrl,
-    );
+    });
   }
 
   async getPostById(postId: number) {
@@ -62,14 +37,10 @@ export class PostService {
     return post;
   }
 
-  async createPost(authorId: number, postDto: CreatePostDto, image?: string) {
+  async createPost(authorId: number, postDto: CreatePostDto) {
     const post = this.postsRepository.create({
       author: { id: authorId },
-      title: postDto.title,
-      content: postDto.content,
-      likeCount: 0,
-      commentCount: 0,
-      image,
+      ...postDto,
     });
     const newPost = await this.postsRepository.save(post);
     return newPost;

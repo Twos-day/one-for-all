@@ -4,9 +4,9 @@ import { AuthModule } from 'src/auth/auth.module';
 import { AwsModule } from 'src/aws/aws.module';
 import { CommonModule } from 'src/common/common.module';
 import { UserModule } from 'src/user/user.module';
-import { TwosdayPostModel } from './entity/post.entity';
-import { TwosdayPostController } from './post.controller';
-import { TwosdayPostService } from './post.service';
+import { TwosdayTagModel } from './entity/tag.entity';
+import { TwosdayTagService } from './tag.service';
+import { TwosdayTagController } from './tag.controller';
 
 @Module({
   imports: [
@@ -14,10 +14,10 @@ import { TwosdayPostService } from './post.service';
     UserModule,
     CommonModule,
     AwsModule,
-    TypeOrmModule.forFeature([TwosdayPostModel]),
+    TypeOrmModule.forFeature([TwosdayTagModel]),
   ],
-  controllers: [TwosdayPostController],
-  providers: [TwosdayPostService],
-  exports: [TwosdayPostService],
+  controllers: [TwosdayTagController],
+  providers: [TwosdayTagService],
+  exports: [TwosdayTagService],
 })
-export class TwosdayPostModule {}
+export class TwosdayTagModule {}

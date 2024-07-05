@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TwosdayService } from './twosday.service';
+import { TwosdayPostModule } from './post/post.module';
+import { TwosdayTagModule } from './tag/tag.module';
 import { TwosdayController } from './twosday.controller';
-import { PostModule } from './post/post.module';
+import { TwosdayService } from './twosday.service';
 
 @Module({
-  imports: [PostModule],
+  imports: [TwosdayPostModule, TwosdayTagModule],
   controllers: [TwosdayController],
   providers: [TwosdayService],
 })

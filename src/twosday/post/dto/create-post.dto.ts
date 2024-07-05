@@ -5,4 +5,5 @@ import { PickType } from '@nestjs/mapped-types';
 export class CreatePostDto extends PickType(TwosdayPostModel, [
   'title',
   'content',
+  'tags',
 ]) {}

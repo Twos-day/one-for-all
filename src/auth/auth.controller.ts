@@ -243,6 +243,7 @@ export class AuthController {
   @UseGuards(BasicTokenGuard)
   @Post('email')
   async postLoginEmail(@User() user: UserModel, @Req() req: Request) {
+    await this.userService.updateLoginAt(user.id);
     const refreshToken = this.authService.createRefreshToken(user);
 
     req.res.status(200);

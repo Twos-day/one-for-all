@@ -19,52 +19,43 @@ import { User } from 'src/user/decorator/user.decorator';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PaginatePostDto } from './dto/paginate-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
-import { PostService } from './post.service';
+import { TwosdayPostService } from './post.service';
 
-@Controller('post')
-export class PostController {
-  constructor(private readonly postsService: PostService) {}
+@Controller('api/twosday')
+export class TwosdayPostController {
+  constructor(private readonly twosdayPostService: TwosdayPostService) {}
 
-  @Get()
-  getPosts(@Query() postDto: PaginatePostDto) {
-    return this.postsService.paginatePosts(postDto);
+  @Get('post')
+  async getAllPost() {
+    const posts = await this.twosdayPostService.getAllPosts();
+    return { posts };
   }
 
-  @Get(':id')
-  getPostsById(@Param('id', ParseIntPipe) id: number) {
-    return this.postsService.getPostById(id);
+  @Get('post/:id')
+  async getPostsById(@Param('id', ParseIntPipe) id: number) {
+    const post = await this.twosdayPostService.getPostById(id);
+    return { post };
   }
 
-  @Post('dummy')
+  @Post('post')
   @UseGuards(ActivatedUserGuard)
-  postDummyPosts(@User('id') userId: number) {
-    return this.postsService.generatePosts(userId);
-  }
-
-  @Post()
-  @UseInterceptors(FileInterceptor('image'))
-  @UseGuards(ActivatedUserGuard)
-  postPosts(
-    @User('id') userId: number,
-    @Body() postDto: CreatePostDto,
-    @Body('isPublic', new DefaultValuePipe(true)) isPublic: boolean,
-    @UploadedFile() file?: Express.Multer.File,
-  ) {
-    return this.postsService.createPost(userId, postDto, file?.filename);
+  postPosts(@User('id') userId: number, @Body() postDto: CreatePostDto) {
+    console.log('dto', postDto);
+    return this.twosdayPostService.createPost(userId, postDto);
   }
 
   // put   -> 전체 수정, 존재하지 않을시 생성
   // patch -> 일부 수정
-  @Patch(':id')
+  @Patch('post/:id')
   patchPostsById(
     @Param('id', ParseIntPipe) id: number,
     @Body() postDto: UpdatePostDto,
   ) {
-    return this.postsService.updatePost(id, postDto);
+    return this.twosdayPostService.updatePost(id, postDto);
   }
 
-  @Delete(':id')
+  @Delete('post/:id')
   deletePostsById(@Param('id', ParseIntPipe) id: number) {
-    return this.postsService.deletePost(id);
+    return this.twosdayPostService.deletePost(id);
   }
 }
