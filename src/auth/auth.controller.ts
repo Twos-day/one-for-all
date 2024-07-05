@@ -74,7 +74,7 @@ export class AuthController {
     }
 
     const redirectUrl: string =
-      req.cookies.redirect || process.env.PORTOCOL + '://' + process.env.HOST;
+      req.cookies.redirect || process.env.PROTOCOL + '://' + process.env.HOST;
 
     if (user.accountType !== AccountType.google) {
       const cause = '구글 계정으로 가입된 사용자가 아닙니다.';
@@ -142,7 +142,7 @@ export class AuthController {
     }
 
     const redirectUrl: string =
-      req.cookies.redirect || process.env.PORTOCOL + '://' + process.env.HOST;
+      req.cookies.redirect || process.env.PROTOCOL + '://' + process.env.HOST;
 
     if (user.accountType !== AccountType.kakao) {
       const cause = '카카오 계정으로 가입된 사용자가 아닙니다.';
