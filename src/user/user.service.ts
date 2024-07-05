@@ -6,6 +6,7 @@ import { StatusEnum } from './const/status.const';
 import { RegisterUserDto } from '@/auth/dto/register-user.dto';
 import { UpdateUserDto } from '@/auth/dto/update-user.dto';
 import { isAfter } from 'date-fns';
+import { AccountType } from './const/account-type.const';
 
 @Injectable()
 export class UserService {
@@ -17,20 +18,6 @@ export class UserService {
   async getAllUsers() {
     const users = await this.usersRepository.find();
     return users;
-  }
-
-  async createUser(user: Pick<UserModel, 'nickname' | 'email' | 'password'>) {
-    const emailExists = await this.usersRepository.exists({
-      where: { email: user.email },
-    });
-
-    if (emailExists) {
-      throw new BadRequestException('이미 존재하는 이메일입니다.');
-    }
-
-    const userObj = this.usersRepository.create(user);
-    const newUser = this.usersRepository.save(userObj);
-    return newUser;
   }
 
   async getUserById(id: number) {
@@ -48,7 +35,7 @@ export class UserService {
     });
   }
 
-  async registerUser(dto: RegisterUserDto, isSocial: boolean) {
+  async registerUser(dto: RegisterUserDto, accountType: AccountType) {
     const emailExists = await this.usersRepository.exists({
       where: { email: dto.email },
     });
@@ -59,8 +46,7 @@ export class UserService {
 
     const user = this.usersRepository.create({
       ...dto,
-      nickname: dto.email.split('@')[0],
-      isSocial,
+      accountType,
       status: StatusEnum.unauthorized,
     });
 
@@ -100,6 +86,10 @@ export class UserService {
 
   async generateVerificationCode(id: number) {
     const findOne = await this.usersRepository.findOne({ where: { id } });
+
+    if (!findOne) {
+      throw new BadRequestException();
+    }
 
     /** 6자리 숫자를 랜덤으로 생성 */
     const verificationCode = Math.floor(Math.random() * 1000000)

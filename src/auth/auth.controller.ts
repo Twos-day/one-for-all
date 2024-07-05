@@ -5,27 +5,30 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
+  InternalServerErrorException,
   Logger,
   Param,
-  Patch,
   Post,
+  Query,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as bycrypt from 'bcrypt';
-import { Request } from 'express';
+import { User } from '@/user/decorator/user.decorator';
+import { UserModel } from '@/user/entities/user.entity';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { AccessTokenGuard, RefreshTokenGuard } from './guard/bear-token.guard';
 import { SessionDto } from './dto/session.dto';
-import { User } from '@/user/decorator/user.decorator';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { BasicTokenGuard } from './guard/basic-token.guard';
-import { UserModel } from '@/user/entities/user.entity';
+import { AccessTokenGuard, RefreshTokenGuard } from './guard/bear-token.guard';
+import { Request, Response } from 'express';
+import { StatusEnum } from '@/user/const/status.const';
+import { AccountType } from '@/user/const/account-type.const';
 
 @ApiTags('Auth')
 @Controller('api/auth')
@@ -39,31 +42,151 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(AuthGuard('google'))
-  async googleAuth(@Req() req: any) {}
+  async googleAuth(@Req() req: Request) {}
 
   @Get('callback/google')
   @UseGuards(AuthGuard('google'))
-  async googleAuthRedirect(@Req() req: any) {
-    // 구글 인증이 완료된 후, 사용자 정보를 처리하는 메소드입니다.
-    // req.user에 사용자 정보가 담겨있습니다.
-    return req.user;
+  async googleAuthRedirect(@Req() req: Request) {
+    const googleUser = req.user as {
+      readonly email: string;
+      readonly nickname: string;
+      readonly picture: string;
+      readonly accessToken: string;
+    };
+
+    let user = await this.userService.getUserByEmail(googleUser.email);
+
+    if (!user) {
+      user = await this.userService.registerUser(
+        {
+          email: googleUser.email,
+          nickname: googleUser.nickname,
+          avatar: googleUser.picture,
+        },
+        AccountType.google,
+      );
+    }
+
+    const redirectUrl: undefined | string = req.cookies.redirect;
+
+    if (user.accountType !== AccountType.google) {
+      const cause = '구글 계정으로 가입된 사용자가 아닙니다.';
+      req.res.redirect(
+        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+      );
+      return;
+    }
+
+    if (user.status === StatusEnum.deactivated) {
+      const cause = '접근할 수 없는 계정입니다.';
+      req.res.redirect(
+        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+      );
+      return;
+    }
+
+    if (user.status === StatusEnum.activated) {
+      const refreshToken = this.authService.createRefreshToken(user);
+
+      req.res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        path: '/',
+        sameSite: 'strict',
+        secure: this.configService.get('PROTOCAL') === 'https',
+      });
+
+      req.res.redirect(`${redirectUrl}`);
+      return;
+    }
+
+    if (user.status === StatusEnum.unauthorized) {
+      const refreshToken = this.authService.createRefreshToken(user);
+
+      req.res.redirect(`${redirectUrl}/register?refreshToken=${refreshToken}`);
+      return;
+    }
+
+    throw new InternalServerErrorException();
   }
 
   @Get('kakao')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoAuth(@Req() req: any) {}
+  async kakaoAuth(@Req() req: Request) {}
 
   @Get('callback/kakao')
   @UseGuards(AuthGuard('kakao'))
-  async kakaoAuthRedirect(@Req() req: any) {
-    // 카카오 인증이 완료된 후, 사용자 정보를 처리하는 메소드입니다.
-    return req.user;
+  async kakaoAuthRedirect(@Req() req: Request) {
+    const kakaoUser = req.user as {
+      readonly email: string;
+      readonly nickname: string;
+      readonly accessToken: string;
+      readonly kakaoId: number;
+      readonly picture: string;
+    };
+
+    let user = await this.userService.getUserByEmail(kakaoUser.email);
+
+    if (!user) {
+      user = await this.userService.registerUser(
+        {
+          email: kakaoUser.email,
+          nickname: kakaoUser.nickname,
+          avatar: kakaoUser.picture,
+        },
+        AccountType.kakao,
+      );
+    }
+
+    const redirectUrl: string =
+      req.cookies.redirect || process.env.PORTOCOL + '://' + process.env.HOST;
+
+    if (user.accountType !== AccountType.kakao) {
+      const cause = '카카오 계정으로 가입된 사용자가 아닙니다.';
+      req.res.redirect(
+        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+      );
+      return;
+    }
+
+    if (user.status === StatusEnum.deactivated) {
+      const cause = '접근할 수 없는 계정입니다.';
+      req.res.redirect(
+        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+      );
+      return;
+    }
+
+    if (user.status === StatusEnum.activated) {
+      const refreshToken = this.authService.createRefreshToken(user);
+
+      req.res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        path: '/',
+        sameSite: 'strict',
+        secure: this.configService.get('PROTOCAL') === 'https',
+      });
+
+      req.res.redirect(`${redirectUrl}`);
+      return;
+    }
+
+    if (user.status === StatusEnum.unauthorized) {
+      const refreshToken = this.authService.createRefreshToken(user);
+
+      req.res.redirect(`${redirectUrl}/register?refreshToken=${refreshToken}`);
+      return;
+    }
+
+    throw new InternalServerErrorException();
   }
 
   @Post('register')
   /** 이메일 회원가입 - 1 */
   async postRegisterEmail(@Body() userDto: RegisterUserDto) {
-    const result = await this.userService.registerUser(userDto, false);
+    const result = await this.userService.registerUser(
+      userDto,
+      AccountType.email,
+    );
 
     return { id: result.id, message: '이메일이 성공적으로 등록되었습니다.' };
   }
@@ -83,7 +206,7 @@ export class AuthController {
 
   @Post('register/:id')
   /** 이메일 회원가입 - 3 */
-  async patchNewUser(@Body() userDto: UpdateUserDto) {
+  async postNewUser(@Body() userDto: UpdateUserDto) {
     const hash = await bycrypt.hash(
       userDto.password,
       Number(this.configService.get<string>('HASH_ROUNDS')),
@@ -103,7 +226,6 @@ export class AuthController {
   async postLoginEmail(@User() user: UserModel, @Req() req: Request) {
     const refreshToken = this.authService.createRefreshToken(user);
 
-    console.log('refreshToken', refreshToken);
     req.res.status(200);
 
     req.res.cookie('refreshToken', refreshToken, {

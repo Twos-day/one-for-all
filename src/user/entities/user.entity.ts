@@ -6,6 +6,7 @@ import { IsEmail, IsString, Length, IsOptional } from 'class-validator';
 import { Column, Entity, OneToMany } from 'typeorm';
 import { StatusEnum } from '../const/status.const';
 import { ApiProperty } from '@nestjs/swagger';
+import { AccountType } from '../const/account-type.const';
 
 @Entity()
 export class UserModel extends BaseModel {
@@ -33,9 +34,9 @@ export class UserModel extends BaseModel {
   @ApiProperty()
   avatar: string | null;
 
-  @Column()
+  @Column({ type: 'enum', enum: AccountType, default: AccountType.email })
   @ApiProperty()
-  isSocial: boolean;
+  accountType: AccountType;
 
   @Length(6)
   @IsString()
