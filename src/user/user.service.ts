@@ -15,14 +15,9 @@ export class UserService {
     private readonly usersRepository: Repository<UserModel>,
   ) {}
 
-  async getAllUsers() {
-    const users = await this.usersRepository.find();
-    return users;
-  }
-
-  async getUserById(id: number) {
-    return this.usersRepository.findOne({ where: { id } });
-  }
+  // async getUserById(id: number) {
+  //   return this.usersRepository.findOne({ where: { id } });
+  // }
 
   async getUserByEmail(email: string) {
     return this.usersRepository.findOne({ where: { email } });
@@ -36,21 +31,13 @@ export class UserService {
   }
 
   async registerUser(dto: RegisterUserDto, accountType: AccountType) {
-    const emailExists = await this.usersRepository.exists({
-      where: { email: dto.email },
-    });
-
-    if (emailExists) {
-      throw new BadRequestException('이미 가입된 이메일입니다.');
-    }
-
-    const user = this.usersRepository.create({
+    const newUser = this.usersRepository.create({
       ...dto,
       accountType,
       status: StatusEnum.unauthorized,
     });
 
-    return this.usersRepository.save(user);
+    return await this.usersRepository.save(newUser);
   }
 
   async updateNewUser(dto: UpdateUserDto) {
@@ -102,5 +89,21 @@ export class UserService {
     });
 
     return { email: findOne.email, code: verificationCode };
+  }
+
+  async checkVerificationCode(email: string, code: string) {
+    if (typeof code !== 'string' || code.length !== 6) {
+      throw new BadRequestException('입력정보가 정확하지 않습니다.');
+    }
+
+    const isExist = await this.usersRepository.exists({
+      where: { email, verificationCode: code },
+    });
+
+    if (!isExist) {
+      throw new BadRequestException('인증번호가 일치하지 않습니다.');
+    }
+
+    return isExist;
   }
 }

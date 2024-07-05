@@ -79,7 +79,7 @@ export class S3ImageInterceptor implements NestInterceptor {
       throw new BadRequestException('이미지 파일이 없습니다.');
     }
 
-    this.imageService.saveMetadata(user.id, request.file.key);
+    this.imageService.saveMetadata(user.email, request.file.key);
 
     return next
       .handle()

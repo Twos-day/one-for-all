@@ -1,3 +1,4 @@
+import { AccountType } from '@/user/const/account-type.const';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -97,6 +98,7 @@ export class AuthService {
       id: user.id,
       email: user.email,
       nickname: user.nickname,
+      accountType: user.accountType,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

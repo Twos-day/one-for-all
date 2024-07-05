@@ -1,4 +1,4 @@
-import { AccessTokenGuard } from '@/auth/guard/bear-token.guard';
+import { ActivatedUserGuard } from '@/auth/guard/bear-token.guard';
 import {
   Body,
   Controller,
@@ -36,14 +36,14 @@ export class PostController {
   }
 
   @Post('dummy')
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(ActivatedUserGuard)
   postDummyPosts(@User('id') userId: number) {
     return this.postsService.generatePosts(userId);
   }
 
   @Post()
   @UseInterceptors(FileInterceptor('image'))
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(ActivatedUserGuard)
   postPosts(
     @User('id') userId: number,
     @Body() postDto: CreatePostDto,

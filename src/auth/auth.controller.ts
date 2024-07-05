@@ -1,6 +1,7 @@
 import { MailService } from '@/mail/mail.service';
 import { UserService } from '@/user/user.service';
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -25,7 +26,11 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { SessionDto } from './dto/session.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { BasicTokenGuard } from './guard/basic-token.guard';
-import { AccessTokenGuard, RefreshTokenGuard } from './guard/bear-token.guard';
+import {
+  ActivatedUserGuard,
+  RegistedUserGuard,
+  RefreshTokenGuard,
+} from './guard/bear-token.guard';
 import { Request, Response } from 'express';
 import { StatusEnum } from '@/user/const/status.const';
 import { AccountType } from '@/user/const/account-type.const';
@@ -57,6 +62,7 @@ export class AuthController {
     let user = await this.userService.getUserByEmail(googleUser.email);
 
     if (!user) {
+      // 유저가 없으면 새로 생성
       user = await this.userService.registerUser(
         {
           email: googleUser.email,
@@ -67,22 +73,21 @@ export class AuthController {
       );
     }
 
-    const redirectUrl: undefined | string = req.cookies.redirect;
+    const redirectUrl: string =
+      req.cookies.redirect || process.env.PORTOCOL + '://' + process.env.HOST;
 
     if (user.accountType !== AccountType.google) {
       const cause = '구글 계정으로 가입된 사용자가 아닙니다.';
-      req.res.redirect(
+      return req.res.redirect(
         `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
       );
-      return;
     }
 
     if (user.status === StatusEnum.deactivated) {
       const cause = '접근할 수 없는 계정입니다.';
-      req.res.redirect(
+      return req.res.redirect(
         `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
       );
-      return;
     }
 
     if (user.status === StatusEnum.activated) {
@@ -95,17 +100,13 @@ export class AuthController {
         secure: this.configService.get('PROTOCAL') === 'https',
       });
 
-      req.res.redirect(`${redirectUrl}`);
-      return;
+      return req.res.redirect(`${redirectUrl}`);
     }
 
     if (user.status === StatusEnum.unauthorized) {
-      const refreshToken = this.authService.createRefreshToken(user);
+      const token = this.authService.createRefreshToken(user);
 
-      req.res.redirect(
-        `${redirectUrl}/signup/social?refreshToken=${refreshToken}`,
-      );
-      return;
+      return req.res.redirect(`${redirectUrl}/signup/register?token=${token}`);
     }
 
     throw new InternalServerErrorException();
@@ -129,6 +130,7 @@ export class AuthController {
     let user = await this.userService.getUserByEmail(kakaoUser.email);
 
     if (!user) {
+      // 유저가 없으면 새로 생성
       user = await this.userService.registerUser(
         {
           email: kakaoUser.email,
@@ -144,18 +146,16 @@ export class AuthController {
 
     if (user.accountType !== AccountType.kakao) {
       const cause = '카카오 계정으로 가입된 사용자가 아닙니다.';
-      req.res.redirect(
+      return req.res.redirect(
         `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
       );
-      return;
     }
 
     if (user.status === StatusEnum.deactivated) {
       const cause = '접근할 수 없는 계정입니다.';
-      req.res.redirect(
+      return req.res.redirect(
         `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
       );
-      return;
     }
 
     if (user.status === StatusEnum.activated) {
@@ -168,38 +168,44 @@ export class AuthController {
         secure: this.configService.get('PROTOCAL') === 'https',
       });
 
-      req.res.redirect(`${redirectUrl}`);
-      return;
+      return req.res.redirect(`${redirectUrl}`);
     }
 
     if (user.status === StatusEnum.unauthorized) {
-      const refreshToken = this.authService.createRefreshToken(user);
+      const token = this.authService.createRefreshToken(user);
 
-      req.res.redirect(
-        `${redirectUrl}/signup/social?refreshToken=${refreshToken}`,
-      );
-      return;
+      return req.res.redirect(`${redirectUrl}/signup/register?token=${token}`);
     }
 
     throw new InternalServerErrorException();
   }
 
   @Post('register')
-  /** 이메일 회원가입 - 1 */
-  async postRegisterEmail(@Body() userDto: RegisterUserDto) {
-    const result = await this.userService.registerUser(
-      userDto,
-      AccountType.email,
-    );
+  async postRegisterEmail(
+    @Body() userDto: RegisterUserDto,
+    @Req() req: Request,
+  ) {
+    let user = await this.userService.getUserByEmail(userDto.email);
 
-    return { id: result.id, message: '이메일이 성공적으로 등록되었습니다.' };
+    if (!user) {
+      // 유저가 없으면 새로생성
+      user = await this.userService.registerUser(userDto, AccountType.email);
+    }
+
+    if (user.status !== StatusEnum.unauthorized) {
+      throw new BadRequestException('이미 가입된 사용자입니다.');
+    }
+
+    const token = this.authService.createRefreshToken(user);
+
+    return { token, message: '사용자 생성이 확인되었습니다.' };
   }
 
-  @Post('verification/:id')
+  @UseGuards(RegistedUserGuard)
+  @Post('verification')
   /** 이메일 회원가입 인증번호 생성 - 2 */
-  async postVerificationCode(@Param('id') id: string) {
-    const { email, code } =
-      await this.userService.generateVerificationCode(+id);
+  async postVerificationCode(@User('id') id: number) {
+    const { email, code } = await this.userService.generateVerificationCode(id);
 
     await this.mailService.sendVerificationCode(email, code);
 
@@ -208,8 +214,18 @@ export class AuthController {
     return { message: '메일이 성공적으로 전송되었습니다.' };
   }
 
+  @UseGuards(RegistedUserGuard)
+  @Get('verification')
+  async checkVerificationCode(
+    @User('email') email: string,
+    @Query('code') code: undefined | string,
+  ) {
+    await this.userService.checkVerificationCode(email, code);
+    return { message: '인증번호가 확인되었습니다.' };
+  }
+
+  @UseGuards(RegistedUserGuard)
   @Post('register/:id')
-  /** 이메일 회원가입 - 3 */
   async postNewUser(@Body() userDto: UpdateUserDto) {
     const hash = await bycrypt.hash(
       userDto.password,
@@ -221,12 +237,11 @@ export class AuthController {
       password: hash,
     });
 
-    return { id, message: '회원정보가 성공적으로 등록되었습니다.' };
+    return { message: '회원가입이 완료되었습니다.' };
   }
 
   @UseGuards(BasicTokenGuard)
   @Post('email')
-  /** 이메일 로그인 */
   async postLoginEmail(@User() user: UserModel, @Req() req: Request) {
     const refreshToken = this.authService.createRefreshToken(user);
 
@@ -263,7 +278,7 @@ export class AuthController {
   // }
 
   /** 탈퇴 */
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(ActivatedUserGuard)
   @Delete(':id')
   deleteUser(@User('id') id: number) {
     return this.userService.deleteUser(id);

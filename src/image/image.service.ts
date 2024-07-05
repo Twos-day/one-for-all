@@ -14,8 +14,8 @@ export class ImageService {
     private readonly imageRepository: Repository<ImageModel>,
   ) {}
 
-  async saveMetadata(id: number, key: string) {
-    const user = await this.userService.getUserById(id);
+  async saveMetadata(email: string, key: string) {
+    const user = await this.userService.getUserByEmail(email);
     const image = this.imageRepository.create({ user, key });
     return await this.imageRepository.save(image);
   }
