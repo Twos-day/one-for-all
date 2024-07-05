@@ -1,4 +1,5 @@
 import { AccountType } from '@/user/const/account-type.const';
+import { StatusEnum } from '@/user/const/status.const';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -54,8 +55,12 @@ export class AuthService {
   ) {
     const existingUser = await this.userService.getUserByEmail(user.email);
 
-    if (!existingUser) {
-      throw new UnauthorizedException('존재하지 않는 사용자입니다.');
+    if (!existingUser || existingUser.status === StatusEnum.unauthorized) {
+      throw new UnauthorizedException('이메일 또는 비밀번호가 잘못되었습니다.');
+    }
+
+    if (existingUser.status === StatusEnum.deactivated) {
+      throw new UnauthorizedException('비활성화된 계정입니다.');
     }
 
     const isPass = await bycrypt.compare(user.password, existingUser.password);
