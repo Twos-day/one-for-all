@@ -102,7 +102,9 @@ export class AuthController {
     if (user.status === StatusEnum.unauthorized) {
       const refreshToken = this.authService.createRefreshToken(user);
 
-      req.res.redirect(`${redirectUrl}/register?refreshToken=${refreshToken}`);
+      req.res.redirect(
+        `${redirectUrl}/signup/social?refreshToken=${refreshToken}`,
+      );
       return;
     }
 
@@ -173,7 +175,9 @@ export class AuthController {
     if (user.status === StatusEnum.unauthorized) {
       const refreshToken = this.authService.createRefreshToken(user);
 
-      req.res.redirect(`${redirectUrl}/register?refreshToken=${refreshToken}`);
+      req.res.redirect(
+        `${redirectUrl}/signup/social?refreshToken=${refreshToken}`,
+      );
       return;
     }
 
