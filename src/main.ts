@@ -41,14 +41,29 @@ async function bootstrap() {
   app.use(urlencoded({ extended: true, limit: '500mb' }));
   app.use(cookieParser());
 
-  // cors 허용
-  app.enableCors({
-    origin: [
+  function checkOrigin(origin: string | undefined): boolean {
+    if (!origin) return true; // 서버에서 시작하는 요청은 허용
+    const whitelist = [
       'http://localhost:3000',
       'http://localhost:3001',
       'https://twosday.live',
-      'https://*.twosday.live',
-    ],
+    ];
+
+    return whitelist.some(
+      (allowedOrigin) =>
+        origin.startsWith(allowedOrigin) || origin.endsWith('.twosday.live'),
+    );
+  }
+
+  // cors 허용
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (checkOrigin(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
@@ -65,4 +80,5 @@ async function bootstrap() {
     );
   });
 }
+
 bootstrap();
