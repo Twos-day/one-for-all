@@ -6,6 +6,7 @@ import { HttpExceptionFilter } from './http-exception.filter';
 import { urlencoded, json } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import { LoggerMiddleware } from './logger.middleware';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -51,6 +52,9 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
+
+  // 디버깅용
+  app.use(new LoggerMiddleware().use);
 
   // app.enableShutdownHooks();
 
