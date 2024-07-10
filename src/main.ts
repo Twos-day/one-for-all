@@ -42,7 +42,12 @@ async function bootstrap() {
 
   // cors 허용
   app.enableCors({
-    origin: ['http://localhost:3000'],
+    origin: [
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'https://twosday.live',
+      'https://*.twosday.live',
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     credentials: true,
   });
