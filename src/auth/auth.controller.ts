@@ -163,8 +163,7 @@ export class AuthController {
 
       req.res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        path: '/',
-        sameSite: 'strict',
+        domain: req.hostname,
         secure: this.configService.get('PROTOCAL') === 'https',
       });
 
@@ -250,8 +249,7 @@ export class AuthController {
 
     req.res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      path: '/',
-      sameSite: 'strict',
+      domain: req.hostname,
       secure: this.configService.get('PROTOCAL') === 'https',
     });
 
