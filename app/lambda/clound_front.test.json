@@ -1,0 +1,33 @@
+{
+  "Records": [
+    {
+      "cf": {
+        "config": {
+          "distributionDomainName": "d1e7n5w7ku9qm7.cloudfront.net",
+          "distributionId": "EDFDVBD6EXAMPLE",
+          "eventType": "origin-request"
+        },
+        "request": {
+          "clientIp": "203.0.113.178",
+          "headers": {
+            "host": [
+              {
+                "key": "Host",
+                "value": "d1e7n5w7ku9qm7.cloudfront.net"
+              }
+            ],
+            "user-agent": [
+              {
+                "key": "User-Agent",
+                "value": "curl/7.51.0"
+              }
+            ]
+          },
+          "method": "GET",
+          "querystring": "width=300&q=80",
+          "uri": "/twosday/6/5bd5dce3-2549-43c3-9432-30fc801bfee7.jpg"
+        }
+      }
+    }
+  ]
+}
