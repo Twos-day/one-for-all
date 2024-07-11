@@ -34,6 +34,7 @@ import {
 import { Request, Response } from 'express';
 import { StatusEnum } from '@/user/const/status.const';
 import { AccountType } from '@/user/const/account-type.const';
+import { excuteRootDomain } from './util/excute-root-domain';
 
 @ApiTags('Auth')
 @Controller('api/auth')
@@ -95,8 +96,7 @@ export class AuthController {
 
       req.res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        path: '/',
-        sameSite: 'strict',
+        domain: excuteRootDomain(process.env.HOST),
         secure: this.configService.get('PROTOCAL') === 'https',
       });
 
@@ -163,7 +163,7 @@ export class AuthController {
 
       req.res.cookie('refreshToken', refreshToken, {
         httpOnly: true,
-        domain: req.hostname,
+        domain: excuteRootDomain(process.env.HOST),
         secure: this.configService.get('PROTOCAL') === 'https',
       });
 
