@@ -31,7 +31,7 @@ import {
   RegistedUserGuard,
   RefreshTokenGuard,
 } from './guard/bear-token.guard';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { StatusEnum } from '@/user/const/status.const';
 import { AccountType } from '@/user/const/account-type.const';
 import { excuteRootDomain } from './util/excute-root-domain';
@@ -249,7 +249,7 @@ export class AuthController {
 
     req.res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      domain: req.hostname,
+      domain: excuteRootDomain(process.env.HOST),
       secure: this.configService.get('PROTOCAL') === 'https',
     });
 
