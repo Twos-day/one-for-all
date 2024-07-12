@@ -1,7 +1,6 @@
 {
   "name": "lambda",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
     "docker-build": "docker build -t lambda .",
     "docker-run": "docker run --name lambda -it lambda",

@@ -30,10 +30,9 @@ import { MailModule } from './mail/mail.module';
       rootPath: PUBLIC_FOLDER_PATH,
       exclude: ['/api*'],
       serveStaticOptions: {
-        // false일시 Error 발생
-        fallthrough: false,
+        // false일시 server side 404 발생
+        fallthrough: true,
       },
-      serveRoot: '/public', //접두어
     }),
     ConfigModule.forRoot({
       envFilePath: `.env.${process.env.NODE_ENV}`,

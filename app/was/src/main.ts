@@ -46,6 +46,8 @@ async function bootstrap() {
     const whitelist = [
       'http://localhost:3000',
       'http://localhost:3001',
+      'http://localhost:8080',
+      'http://localhost:8081',
       'https://twosday.live',
     ];
 
