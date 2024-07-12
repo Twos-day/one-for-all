@@ -34,9 +34,9 @@ export class UserModel extends BaseModel {
   @ApiProperty()
   avatar: string | null;
 
-  @Column({ type: 'enum', enum: AccountType })
+  @Column({ type: 'enum', enum: AccountType, nullable: true })
   @ApiProperty()
-  accountType: AccountType;
+  accountType?: AccountType;
 
   @Length(6)
   @IsString()

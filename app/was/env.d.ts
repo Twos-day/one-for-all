@@ -4,7 +4,7 @@ declare global {
       readonly NODE_ENV: 'local' | 'prod' | 'test';
       readonly TZ?: string;
 
-      readonly PORTOCOL: 'http' | 'https';
+      readonly PROTOCOL: 'http' | 'https';
       readonly HOST: string;
 
       readonly JWT_SECRET: string;

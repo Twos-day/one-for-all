@@ -6,6 +6,8 @@ import { JwtService } from '@nestjs/jwt';
 import * as bycrypt from 'bcrypt';
 import { UserModel } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
+import { Response } from 'express';
+import { excuteRootDomain } from './util/excute-root-domain';
 
 type PayLoad = {
   id: number;
@@ -19,6 +21,14 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly configService: ConfigService,
   ) {}
+
+  setRefreshCookie(res: Response, token: string) {
+    res.cookie('refreshToken', token, {
+      httpOnly: true,
+      domain: excuteRootDomain(process.env.HOST),
+      secure: process.env.PROTOCOL === 'https',
+    });
+  }
 
   extractTokenFromReq(req: any, isBearer: boolean) {
     const rawToken = req.headers.authorization;

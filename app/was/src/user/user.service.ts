@@ -3,10 +3,11 @@ import { Repository } from 'typeorm';
 import { UserModel } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { StatusEnum } from './const/status.const';
-import { RegisterUserDto } from '@/auth/dto/register-user.dto';
+import { EmailUserDto } from '@/auth/dto/email-user.dto';
 import { UpdateUserDto } from '@/auth/dto/update-user.dto';
 import { isAfter } from 'date-fns';
 import { AccountType } from './const/account-type.const';
+import { SocialUserDto } from '@/auth/dto/social-user.dto';
 
 @Injectable()
 export class UserService {
@@ -30,10 +31,13 @@ export class UserService {
     });
   }
 
-  async registerUser(dto: RegisterUserDto, accountType: AccountType) {
+  async registerUser(dto: EmailUserDto | SocialUserDto) {
+    const nickname =
+      'accessToken' in dto ? dto.nickname : dto.email.split('@')[0];
+
     const newUser = this.usersRepository.create({
-      ...dto,
-      accountType,
+      nickname,
+      email: dto.email,
       status: StatusEnum.unauthorized,
     });
 
