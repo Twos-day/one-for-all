@@ -1,7 +1,7 @@
 import { PropsWithChildren, useState } from "react";
 import { QueryClient, QueryCache, QueryClientProvider } from "@tanstack/react-query";
 // import ErrorModal from "./modal/ErrorModal";
-import { useSetModalStore } from "../_lib/modalStore";
+import { useSetModalStore } from "../../_lib/modalStore";
 
 export default function ReactQuery({ children }: PropsWithChildren) {
   const modalStore = useSetModalStore();
@@ -13,10 +13,10 @@ export default function ReactQuery({ children }: PropsWithChildren) {
           const querykey = query.queryKey;
           if (querykey.includes("ignore")) return;
 
-          if (error instanceof Error) {
-            window.location.href = "/sessionout";
-            return;
-          }
+          // if (error instanceof Error) {
+          //   window.location.href = "/sessionout";
+          //   return;
+          // }
 
           // await modalStore.push(ErrorModal, { props: { error } });
         },
@@ -41,12 +41,11 @@ export default function ReactQuery({ children }: PropsWithChildren) {
           gcTime: 0,
           retry: false,
           onError: async (error) => {
-            if (error instanceof Error) {
-              // await signOut({ redirect: false, callbackUrl: "/sessionout" });
-              window.location.href = "/sessionout";
-              return;
-            }
-
+            // if (error instanceof Error) {
+            //   await signOut({ redirect: false, callbackUrl: "/sessionout" });
+            //   window.location.href = "/sessionout";
+            //   return;
+            // }
             // await modalStore.push(ErrorModal, { props: { error } });
           },
         },

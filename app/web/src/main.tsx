@@ -1,14 +1,12 @@
+import "@/style/global.css";
+import "@/style/globalTheme.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
-import Config from "@/app/_component/Config.tsx";
-import Router from "@/app/Router";
-// import "@/style/global.css.ts";
+import App from "@/app/App";
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
+ReactDOM.hydrateRoot(
+  document.getElementById("root")!,
   <React.StrictMode>
-    <Config>
-      <div>asdasd</div>
-      <Router />
-    </Config>
+    <App />
   </React.StrictMode>,
 );

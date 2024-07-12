@@ -1,6 +1,6 @@
 import { createGlobalTheme, createGlobalThemeContract } from "@vanilla-extract/css";
 
-export const global = createGlobalThemeContract({
+export const globalVar = createGlobalThemeContract({
   blueActive: "blueActive",
   blueHover: "blueHover",
   blueDefault: "blueDefault",
@@ -12,7 +12,7 @@ export const global = createGlobalThemeContract({
   grayDisabled: "grayDisabled",
 });
 
-export const whiteGlobalTheme = {
+const whiteGlobalTheme = {
   blueActive: "#4F66D8", // 20%
   blueHover: "#354CBE", // 10%
   blueDefault: "#1C33A5", // 0%
@@ -33,7 +33,7 @@ export const whiteGlobalTheme = {
 //   },
 // };
 
-createGlobalTheme(":root", global, whiteGlobalTheme);
+createGlobalTheme(":root", globalVar, whiteGlobalTheme);
 
 // globalStyle(':root', {
 //   '@media': {

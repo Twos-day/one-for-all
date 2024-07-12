@@ -9,7 +9,7 @@ export default defineConfig({
   plugins: [
     react(),
     vanillaExtractPlugin({
-      // identifiers: ({ hash }) => `css_${hash}`,
+      identifiers: ({ hash }) => `css_${hash}`,
     }),
   ],
   build: {

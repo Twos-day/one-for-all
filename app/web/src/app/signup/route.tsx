@@ -1,7 +1,7 @@
 import { RouteObject } from "react-router-dom";
 import { loadPage } from "../_lib/loadPage";
 
-const signupRoutes: RouteObject[] = [
+export const signupRoute: RouteObject[] = [
   {
     path: "/signup",
     lazy: () => loadPage(import("./page")),
@@ -11,5 +11,3 @@ const signupRoutes: RouteObject[] = [
     lazy: () => loadPage(import("./register/page")),
   },
 ];
-
-export default signupRoutes;
