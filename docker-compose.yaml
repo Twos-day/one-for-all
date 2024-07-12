@@ -1,7 +1,8 @@
-name: one_for_all
+version: "3.3"
 
 services:
   postgres:
+    container_name: one_for_all
     image: postgres:15
     restart: always # 실행을 할때마다 재시작
     volumes:
