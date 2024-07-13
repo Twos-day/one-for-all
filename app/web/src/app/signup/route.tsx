@@ -9,5 +9,6 @@ export const signupRoute: RouteObject[] = [
   {
     path: "/signup/register",
     lazy: () => loadPage(import("./register/page")),
+    errorElement: <div>error</div>,
   },
 ];

@@ -19,6 +19,21 @@ export const loader = async ({ request }: { request: Request }) => {
   });
 };
 
+// function Form() {
+//   const { data } = useSuspenseQuery({
+//     queryKey: ["test"],
+//     queryFn: async () => {
+//       return new Promise((resolve, reject) => {
+//         setTimeout(() => {
+//           reject("ok");
+//         }, 1000);
+//       });
+//     },
+//   });
+
+//   return <div>helloworld</div>;
+// }
+
 export default function Home() {
   const { data } = useLoaderData() as { data: string };
 

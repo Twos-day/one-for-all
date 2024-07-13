@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { defaultBtn } from "../_component/btn/btn.css";
 
 export default function Page() {
   const mutate = useMutation({
@@ -26,10 +27,19 @@ export default function Page() {
     },
   });
 
+  const onClick = (provider: "google") => {
+    // document.cookie = "redirect=" + encodeURIComponent(process.env.NEXT_PUBLIC_API_URL)
+
+    window.location.href = `/api/auth/${provider}`;
+  };
+
   return (
     <div>
       로그인 페이지
       <button onClick={() => mutate.mutate()}>로그인 테스트</button>
+      <button className={defaultBtn} onClick={() => onClick("google")}>
+        google
+      </button>
     </div>
   );
 }
