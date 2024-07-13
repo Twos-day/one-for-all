@@ -1,13 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
-import { UserModel } from './entities/user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
-import { StatusEnum } from './const/status.const';
 import { EmailUserDto } from '@/auth/dto/email-user.dto';
-import { UpdateUserDto } from '@/auth/dto/update-user.dto';
-import { isAfter } from 'date-fns';
-import { AccountType } from './const/account-type.const';
 import { SocialUserDto } from '@/auth/dto/social-user.dto';
+import { UpdateUserDto } from '@/auth/dto/update-user.dto';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { isAfter } from 'date-fns';
+import { Repository } from 'typeorm';
+import { StatusEnum } from './const/status.const';
+import { UserModel } from './entities/user.entity';
 
 @Injectable()
 export class UserService {

@@ -1,13 +1,19 @@
 import { AccountType } from '@/user/const/account-type.const';
 import { StatusEnum } from '@/user/const/status.const';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bycrypt from 'bcrypt';
 import { UserModel } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { excuteRootDomain } from './util/excute-root-domain';
+import { getServerUrl } from '@/common/util/getServerUrl';
 
 type PayLoad = {
   id: number;
@@ -22,15 +28,7 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  setRefreshCookie(res: Response, token: string) {
-    res.cookie('refreshToken', token, {
-      httpOnly: true,
-      domain: excuteRootDomain(process.env.HOST),
-      secure: process.env.PROTOCOL === 'https',
-    });
-  }
-
-  extractTokenFromReq(req: any, isBearer: boolean) {
+  extractTokenFromReq(req: Request, isBearer: boolean) {
     const rawToken = req.headers.authorization;
 
     if (!rawToken) {
@@ -58,6 +56,68 @@ export class AuthService {
     }
 
     return { email, password };
+  }
+
+  veryfySocialUser(
+    req: Request,
+    user: UserModel,
+    accountType: AccountType,
+  ): void {
+    const redirectUrl: string = req.cookies.redirect || getServerUrl();
+
+    if (user.accountType && user.accountType !== accountType) {
+      const cause = `${accountType.toUpperCase()} 계정으로 가입된 사용자가 아닙니다.`;
+      return req.res.redirect(
+        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+      );
+    }
+
+    if (user.status === StatusEnum.deactivated) {
+      const cause = '접근할 수 없는 계정입니다.';
+      return req.res.redirect(
+        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+      );
+    }
+
+    if (user.status === StatusEnum.unauthorized) {
+      // 추가 정보 입력
+      const token = this.createRefreshToken(user);
+      return req.res.redirect(`${redirectUrl}/signup/register?token=${token}`);
+    }
+
+    if (
+      user.accountType === accountType &&
+      user.status === StatusEnum.activated
+    ) {
+      // 로그인 처리
+      const refreshToken = this.createRefreshToken(user);
+      this.setRefreshCookie(req.res, refreshToken);
+      return req.res.redirect(`${redirectUrl}`);
+    }
+
+    throw new InternalServerErrorException('관리자에게 문의하세요.');
+  }
+
+  verifyEmailUser(req: Request, user: UserModel): void {
+    const redirectUrl: string = req.cookies.redirect || getServerUrl();
+
+    if (user.accountType && user.accountType !== AccountType.email) {
+      const cause = '이메일 계정으로 가입된 사용자가 아닙니다.';
+      return req.res.redirect(
+        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+      );
+    }
+
+    if (user.status === StatusEnum.deactivated) {
+      const cause = '접근할 수 없는 계정입니다.';
+      return req.res.redirect(
+        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+      );
+    }
+
+    if (user.status !== StatusEnum.unauthorized) {
+      throw new BadRequestException('이미 가입된 사용자입니다.');
+    }
   }
 
   async authenticateWithEmailAndPassword(
@@ -108,7 +168,15 @@ export class AuthService {
     return refreshToken;
   }
 
-  async createSession(user: UserModel) {
+  setRefreshCookie(res: Response, token: string) {
+    res.cookie('refreshToken', token, {
+      httpOnly: true,
+      domain: excuteRootDomain(process.env.HOST),
+      secure: process.env.PROTOCOL === 'https',
+    });
+  }
+
+  createSession(user: UserModel) {
     const session: Session = {
       id: user.id,
       email: user.email,
