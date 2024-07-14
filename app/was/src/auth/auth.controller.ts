@@ -1,4 +1,3 @@
-import { Id } from '@/common/decorator/id.decorator';
 import { MailService } from '@/mail/mail.service';
 import { AccountType } from '@/user/const/account-type.const';
 import { User } from '@/user/decorator/user.decorator';
@@ -11,6 +10,8 @@ import {
   Get,
   Logger,
   NotFoundException,
+  Param,
+  ParseIntPipe,
   Post,
   Req,
   UseGuards,
@@ -108,7 +109,7 @@ export class AuthController {
   }
 
   @Post('verification/:id')
-  async postVerificationCode(@Id() id: number) {
+  async postVerificationCode(@Param('id', ParseIntPipe) id: number) {
     const user = await this.userService.getUserById(id);
     if (!user) {
       throw new NotFoundException('존재하지 않는 사용자입니다.');

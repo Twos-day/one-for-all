@@ -1,23 +1,20 @@
-import { ActivatedUserGuard } from '@/auth/guard/bear-token.guard';
+import {
+  ActivatedUserGuard,
+  PublicUserGuard,
+} from '@/auth/guard/bear-token.guard';
 import {
   Body,
   Controller,
-  DefaultValuePipe,
   Delete,
   Get,
   Param,
   ParseIntPipe,
   Patch,
   Post,
-  Query,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { User } from 'src/user/decorator/user.decorator';
-import { CreatePostDto } from './dto/create-post.dto';
-import { PaginatePostDto } from './dto/paginate-post.dto';
+import { PostDto } from './dto/post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { TwosdayPostService } from './post.service';
 
@@ -26,12 +23,14 @@ export class TwosdayPostController {
   constructor(private readonly twosdayPostService: TwosdayPostService) {}
 
   @Get('post')
+  @UseGuards(PublicUserGuard)
   async getAllPost() {
     const posts = await this.twosdayPostService.getAllPosts();
     return { posts };
   }
 
   @Get('post/:id')
+  @UseGuards(PublicUserGuard)
   async getPostsById(@Param('id', ParseIntPipe) id: number) {
     const post = await this.twosdayPostService.getPostById(id);
     return { post };
@@ -39,8 +38,7 @@ export class TwosdayPostController {
 
   @Post('post')
   @UseGuards(ActivatedUserGuard)
-  postPosts(@User('id') userId: number, @Body() postDto: CreatePostDto) {
-    console.log('dto', postDto);
+  postPosts(@User('id') userId: number, @Body() postDto: PostDto) {
     return this.twosdayPostService.createPost(userId, postDto);
   }
 

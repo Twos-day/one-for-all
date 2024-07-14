@@ -2,6 +2,7 @@ import { AccountType } from '@/user/const/account-type.const';
 import { StatusEnum } from '@/user/const/status.const';
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   UnauthorizedException,
@@ -37,7 +38,7 @@ export class AuthService {
     const rawToken = req.headers.authorization;
 
     if (!rawToken) {
-      throw new UnauthorizedException('토큰이 없습니다.');
+      throw new BadRequestException('토큰이 없습니다.');
     }
 
     const [type, token] = rawToken.split(' ');
@@ -46,7 +47,7 @@ export class AuthService {
     const isValidate = type && token && prefix === type;
 
     if (!isValidate) {
-      throw new UnauthorizedException('잘못된 토큰입니다.');
+      throw new BadRequestException('잘못된 토큰입니다.');
     }
 
     return token;
@@ -57,7 +58,7 @@ export class AuthService {
     const [email, password] = decoded.split(':');
 
     if (!email || !password) {
-      throw new UnauthorizedException('잘못된 토큰입니다.');
+      throw new BadRequestException('잘못된 토큰입니다.');
     }
 
     return { email, password };
@@ -135,23 +136,31 @@ export class AuthService {
     }
   }
 
-  async authenticateWithEmailAndPassword(
-    user: Pick<UserModel, 'email' | 'password'>,
-  ) {
-    const existingUser = await this.userService.getUserByEmail(user.email);
+  async authenticateWithEmailAndPassword(payload: {
+    email: string;
+    password: string;
+  }) {
+    const existingUser = await this.userService.getUserByEmail(payload.email);
 
     if (!existingUser || existingUser.status === StatusEnum.unauthorized) {
-      throw new UnauthorizedException('이메일 또는 비밀번호가 잘못되었습니다.');
+      throw new BadRequestException('이메일 또는 비밀번호가 잘못되었습니다.');
     }
 
     if (existingUser.status === StatusEnum.deactivated) {
-      throw new UnauthorizedException('비활성화된 계정입니다.');
+      throw new ForbiddenException('비활성화된 계정입니다.');
     }
 
-    const isPass = await bycrypt.compare(user.password, existingUser.password);
+    if (existingUser.accountType !== AccountType.email) {
+      throw new ForbiddenException('이메일로 회원가입된 계정이 아닙니다.');
+    }
+
+    const isPass = await bycrypt.compare(
+      payload.password,
+      existingUser.password,
+    );
 
     if (!isPass) {
-      throw new UnauthorizedException('비밀번호가 일치하지 않습니다.');
+      throw new BadRequestException('이메일 또는 비밀번호가 잘못되었습니다.');
     }
 
     return existingUser;

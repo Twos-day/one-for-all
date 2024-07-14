@@ -7,6 +7,7 @@ import { UserModule } from 'src/user/user.module';
 import { TwosdayPostModel } from './entity/post.entity';
 import { TwosdayPostController } from './post.controller';
 import { TwosdayPostService } from './post.service';
+import { TwosdayTagModule } from '../tag/tag.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { TwosdayPostService } from './post.service';
     UserModule,
     CommonModule,
     AwsModule,
+    TwosdayTagModule,
     TypeOrmModule.forFeature([TwosdayPostModel]),
   ],
   controllers: [TwosdayPostController],
