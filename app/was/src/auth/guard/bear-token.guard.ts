@@ -1,17 +1,18 @@
 import {
+  BadRequestException,
   CanActivate,
   ExecutionContext,
   ForbiddenException,
   Injectable,
-  UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
-import { AuthService } from '../auth.service';
 import { UserService } from 'src/user/user.service';
-import { TokensEnum } from '../const/tokens.const';
-import { Request } from 'express';
+import { AuthService } from '../auth.service';
+
 import { StatusEnum } from '@/user/const/status.const';
 
 @Injectable()
+/** 활성화된 계정인지 체크 */
 export class ActivatedUserGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
@@ -34,7 +35,8 @@ export class ActivatedUserGuard implements CanActivate {
 }
 
 @Injectable()
-export class RegistedUserGuard implements CanActivate {
+/** 등록된 계정인지 체크 */
+export class SignupUserGuard implements CanActivate {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UserService,
@@ -43,31 +45,26 @@ export class RegistedUserGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const req = context.switchToHttp().getRequest();
     const token = this.authService.extractTokenFromReq(req, true);
-    const { id, email } = this.authService.verifyToken(token, false);
-    const user = await this.usersService.getUserByEmail(email);
+    const payload = this.authService.verifyToken(token, true);
+    const user = await this.usersService.getUserByEmail(payload.email);
 
-    if (user.status === StatusEnum.deactivated) {
-      throw new ForbiddenException('잘못된 접근입니다.');
+    if (!user) {
+      throw new NotFoundException('가입되지 않은 사용자입니다.');
     }
 
-    req.user = user;
-    return true;
-  }
-}
+    if (user.status === StatusEnum.deactivated) {
+      throw new ForbiddenException('접근이 제한된 사용자입니다.');
+    }
 
-@Injectable()
-export class RefreshTokenGuard implements CanActivate {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly usersService: UserService,
-  ) {}
+    if (!payload.accountType) {
+      throw new BadRequestException('회원가입 계정정보가 부족합니다.');
+    }
 
-  async canActivate(context: ExecutionContext) {
-    const req = context.switchToHttp().getRequest();
-    const token = this.authService.extractTokenFromReq(req, true);
-    const { id, email } = this.authService.verifyToken(token, true);
-    const user = await this.usersService.getUserByEmail(email);
+    user.accountType = payload.accountType;
+    user.avatar = payload.avatar;
+    user.nickname = payload.nickname;
     req.user = user;
+
     return true;
   }
 }

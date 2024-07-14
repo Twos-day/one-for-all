@@ -7,7 +7,8 @@ declare global {
       readonly PROTOCOL: 'http' | 'https';
       readonly HOST: string;
 
-      readonly JWT_SECRET: string;
+      readonly REFRESH_SECRET: string;
+      readonly ACCESS_SECRET: string;
       readonly HASH_ROUNDS: string;
 
       // DB

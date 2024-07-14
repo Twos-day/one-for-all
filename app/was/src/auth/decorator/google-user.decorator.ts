@@ -17,6 +17,7 @@ export const GoogleUser = createParamDecorator(
       );
     }
 
+    console.log('profile', profile);
     const googleUser: SocialUserDto = {
       email: profile.emails[0].value,
       nickname: profile.displayName,

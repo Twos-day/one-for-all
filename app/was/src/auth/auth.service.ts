@@ -14,10 +14,15 @@ import { UserService } from 'src/user/user.service';
 import { Request, Response } from 'express';
 import { excuteRootDomain } from './util/excute-root-domain';
 import { getServerUrl } from '@/common/util/getServerUrl';
+import { SessionDto } from './dto/session.dto';
+import { SocialUserDto } from './dto/social-user.dto';
 
-type PayLoad = {
+type Payload = {
   id: number;
   email: string;
+  accountType: AccountType;
+  avatar?: string;
+  nickname?: string;
 };
 
 @Injectable()
@@ -58,11 +63,17 @@ export class AuthService {
     return { email, password };
   }
 
-  veryfySocialUser(
+  async veryfySocialUser(
     req: Request,
-    user: UserModel,
+    socialUser: SocialUserDto,
     accountType: AccountType,
-  ): void {
+  ): Promise<void> {
+    let user = await this.userService.getUserByEmail(socialUser.email);
+
+    if (!user) {
+      // 유저가 없으면 새로 생성
+      user = await this.userService.registerUser(socialUser);
+    }
     const redirectUrl: string = req.cookies.redirect || getServerUrl();
 
     if (user.accountType && user.accountType !== accountType) {
@@ -81,7 +92,11 @@ export class AuthService {
 
     if (user.status === StatusEnum.unauthorized) {
       // 추가 정보 입력
-      const token = this.createRefreshToken(user);
+      // 토큰에 dto 추가
+      user.accountType = accountType;
+      user.avatar = socialUser.avatar;
+      user.nickname = socialUser.nickname;
+      const token = this.generateRefreshToken(user);
       return req.res.redirect(`${redirectUrl}/signup/register?token=${token}`);
     }
 
@@ -90,8 +105,8 @@ export class AuthService {
       user.status === StatusEnum.activated
     ) {
       // 로그인 처리
-      const refreshToken = this.createRefreshToken(user);
-      this.setRefreshCookie(req.res, refreshToken);
+      const refreshToken = this.generateRefreshToken(user);
+      this.setRefreshToken(req.res, refreshToken);
       return req.res.redirect(`${redirectUrl}`);
     }
 
@@ -144,31 +159,34 @@ export class AuthService {
 
   verifyToken(token: string, isRefresh: boolean) {
     try {
-      return this.jwrService.verify<PayLoad>(token, {
-        secret: this.configService.get(
-          isRefresh ? 'REFRESH_SECRET' : 'ACCESS_SECRET',
-        ),
+      return this.jwrService.verify<Payload>(token, {
+        secret: isRefresh
+          ? process.env.REFRESH_SECRET
+          : process.env.ACCESS_SECRET,
       });
     } catch (e) {
       throw new UnauthorizedException('토큰이 만료되거나 잘못되었습니다.');
     }
   }
 
-  createRefreshToken(user: UserModel) {
-    const payload = {
+  generateRefreshToken(user: UserModel) {
+    const payload: Payload = {
       id: user.id,
       email: user.email,
+      accountType: user.accountType,
+      avatar: user.avatar,
+      nickname: user.nickname,
     };
 
     const refreshToken = this.jwrService.sign(payload, {
-      secret: this.configService.get<string>('REFRESH_SECRET'),
+      secret: process.env.REFRESH_SECRET,
       expiresIn: 60 * 60 * 24 * 3, //초단위
     });
 
     return refreshToken;
   }
 
-  setRefreshCookie(res: Response, token: string) {
+  setRefreshToken(res: Response, token: string) {
     res.cookie('refreshToken', token, {
       httpOnly: true,
       domain: excuteRootDomain(process.env.HOST),
@@ -177,17 +195,20 @@ export class AuthService {
   }
 
   createSession(user: UserModel) {
-    const session: Session = {
+    const session: SessionDto = {
       id: user.id,
       email: user.email,
+      avatar: user.avatar,
       nickname: user.nickname,
       accountType: user.accountType,
+      level: user.level,
+      status: user.status,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
 
     const accessToken = this.jwrService.sign(session, {
-      secret: this.configService.get<string>('ACCESS_SECRET'),
+      secret: process.env.ACCESS_SECRET,
       expiresIn: 60 * 60, //초단위
     });
 
