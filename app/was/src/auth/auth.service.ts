@@ -34,6 +34,7 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
+  /** true일시 bearer 토큰 */
   extractTokenFromReq(req: Request, isBearer: boolean) {
     const rawToken = req.headers.authorization;
 
@@ -166,6 +167,7 @@ export class AuthService {
     return existingUser;
   }
 
+  /** true일시 refreshToken */
   verifyToken(token: string, isRefresh: boolean) {
     try {
       return this.jwrService.verify<Payload>(token, {

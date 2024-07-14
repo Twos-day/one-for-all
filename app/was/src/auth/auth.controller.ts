@@ -30,8 +30,12 @@ import {
 } from './dto/email-user.dto';
 import { SessionDto } from './dto/session.dto';
 import { PatchSocialUserDto, SocialUserDto } from './dto/social-user.dto';
-import { BasicTokenGuard } from './guard/basic-token.guard';
-import { ActivatedUserGuard, SignupUserGuard } from './guard/bear-token.guard';
+import {
+  BasicTokenGuard,
+  SignupAccessGuard,
+  SignupSessionGuard,
+} from './guard/before-login.guard';
+import { AccessGuard, SessoionUserGuard } from './guard/after-login.guard';
 
 @ApiTags('Auth')
 @Controller('api/auth')
@@ -70,23 +74,6 @@ export class AuthController {
     @Req() req: Request,
   ) {
     return this.authService.veryfySocialUser(req, kakaoUser, AccountType.kakao);
-  }
-
-  @UseGuards(SignupUserGuard)
-  @Post('signup/social')
-  async patchSignupSocial(
-    @User() user: UserModel,
-    @Body() dto: PatchSocialUserDto,
-    @Req() req: Request,
-  ) {
-    const patchedUser = await this.userService.patchUser(
-      user,
-      dto,
-      user.accountType,
-    );
-    const token = this.authService.generateRefreshToken(patchedUser);
-    this.authService.setRefreshToken(req.res, token);
-    return { data: null, message: ['회원가입이 완료 되었습니다.'] };
   }
 
   @Post('signup')
@@ -130,7 +117,14 @@ export class AuthController {
     return { data: { token }, message: ['인증번호가 확인되었습니다.'] };
   }
 
-  @UseGuards(SignupUserGuard)
+  @Get('verification')
+  @UseGuards(SignupSessionGuard)
+  async getVerification(@User() user: UserModel) {
+    const session = this.authService.createSession(user);
+    return { data: session, message: ['세션이 조회되었습니다.'] };
+  }
+
+  @UseGuards(SignupAccessGuard)
   @Post('signup/email')
   async patchSignupEmail(
     @User() user: UserModel,
@@ -148,6 +142,23 @@ export class AuthController {
       AccountType.email,
     );
 
+    const token = this.authService.generateRefreshToken(patchedUser);
+    this.authService.setRefreshToken(req.res, token);
+    return { data: null, message: ['회원가입이 완료 되었습니다.'] };
+  }
+
+  @UseGuards(SignupAccessGuard)
+  @Post('signup/social')
+  async patchSignupSocial(
+    @User() user: UserModel,
+    @Body() dto: PatchSocialUserDto,
+    @Req() req: Request,
+  ) {
+    const patchedUser = await this.userService.patchUser(
+      user,
+      dto,
+      user.accountType,
+    );
     const token = this.authService.generateRefreshToken(patchedUser);
     this.authService.setRefreshToken(req.res, token);
     return { data: null, message: ['회원가입이 완료 되었습니다.'] };
@@ -171,8 +182,8 @@ export class AuthController {
     description: '세션 조회 성공',
     type: SessionDto,
   })
-  @UseGuards(SignupUserGuard)
-  async postSession(@User() user: UserModel) {
+  @UseGuards(SessoionUserGuard)
+  async getSession(@User() user: UserModel) {
     const session = this.authService.createSession(user);
     return { data: session, message: ['세션이 조회되었습니다.'] };
   }
@@ -186,7 +197,7 @@ export class AuthController {
   // }
 
   /** 탈퇴 */
-  @UseGuards(ActivatedUserGuard)
+  @UseGuards(AccessGuard)
   @Delete(':id')
   async deleteUser(@User('id') id: number) {
     await this.userService.deleteUser(id);

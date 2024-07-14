@@ -92,11 +92,15 @@ export class UserService {
 
   async checkVerificationCode(dto: PostVerificationDto) {
     const user = await this.usersRepository.findOne({
-      where: { id: dto.id, email: dto.email, verificationCode: dto.code },
+      where: { id: dto.id, email: dto.email },
     });
 
     if (!user) {
-      throw new BadRequestException('인증번호가 일치하지 않습니다.');
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
+    }
+
+    if (user.verificationCode !== dto.code) {
+      throw new ForbiddenException('인증번호가 일치하지 않습니다.');
     }
 
     if (!user.expiresAt || isAfter(new Date(), user.expiresAt)) {
