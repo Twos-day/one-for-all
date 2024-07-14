@@ -51,7 +51,7 @@ export class SessoionUserGuard implements CanActivate {
     const user = await this.usersService.getUserByEmail(payload.email);
 
     if (!user) {
-      throw new NotFoundException('가입되지 않은 사용자입니다.');
+      throw new NotFoundException('사용자를 찾을 수 없습니다.');
     }
 
     if (user.status !== StatusEnum.activated) {

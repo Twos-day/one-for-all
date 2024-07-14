@@ -7,7 +7,7 @@ export class PostDto {
   title: string;
 
   @IsString()
-  thubmnail: string;
+  thumbnail: string;
 
   @IsString()
   content: string;

@@ -11,9 +11,7 @@ export const User = createParamDecorator(
     const user: UserModel = req.user;
 
     if (!user) {
-      throw new InternalServerErrorException(
-        'Request에 user 프로퍼티가 존재하지 않습니다.',
-      );
+      throw new InternalServerErrorException('사용자 정보가 없습니다.');
     }
 
     return data ? user[data] : user;

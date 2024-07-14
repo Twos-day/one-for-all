@@ -16,11 +16,14 @@ export class TwosdayPostModel extends BaseModel {
   title: string;
 
   @Column()
-  thubmnail: string;
+  thumbnail: string;
 
   @Column('text')
   content: string;
 
   @Column({ default: false })
   isPublic: boolean;
+
+  @Column({ default: 0 })
+  viewCount: number;
 }

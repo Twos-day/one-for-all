@@ -1,4 +1,3 @@
-import { UserModel } from '@/user/entities/user.entity';
 import {
   ForbiddenException,
   Injectable,
@@ -7,10 +6,10 @@ import {
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonService } from 'src/common/common.service';
 import { Repository } from 'typeorm';
+import { TwosdayTagService } from '../tag/tag.service';
+import { PostDto } from './dto/post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { TwosdayPostModel } from './entity/post.entity';
-import { PostDto } from './dto/post.dto';
-import { TwosdayTagService } from '../tag/tag.service';
 
 @Injectable()
 export class TwosdayPostService {
@@ -21,22 +20,24 @@ export class TwosdayPostService {
     private readonly tagsService: TwosdayTagService,
   ) {}
 
-  async getAllPosts(user?: UserModel) {
+  async getAllPosts() {
     return this.postsRepository.find({
       relations: ['author', 'tags'],
-      where: [{ isPublic: false }, { author: { id: user.id } }],
+      where: { isPublic: true },
       select: {
         author: {
           email: true,
           avatar: true,
           nickname: true,
         },
+        deletedAt: false,
       },
     });
   }
 
-  async getPostById(postId: number, user?: UserModel) {
+  async getPostById(postId: number) {
     const post = await this.postsRepository.findOne({
+      relations: ['author', 'tags'],
       where: { id: postId },
     });
 
@@ -44,10 +45,13 @@ export class TwosdayPostService {
       throw new NotFoundException();
     }
 
-    if (post.author.id !== user.id && !post.isPublic) {
+    if (!post.isPublic) {
       throw new ForbiddenException('접근 할 수 없는 게시글입니다.');
     }
 
+    await this.postsRepository.increment({ id: postId }, 'viewCount', 1);
+
+    post.viewCount += 1;
     return post;
   }
 

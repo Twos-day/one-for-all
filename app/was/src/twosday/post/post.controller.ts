@@ -1,7 +1,5 @@
-import {
-  ActivatedUserGuard,
-  PublicUserGuard,
-} from '@/auth/guard/bear-token.guard';
+import { AccessGuard } from '@/auth/guard/after-login.guard';
+import { PublicAccessGuard } from '@/auth/guard/before-login.guard';
 import {
   Body,
   Controller,
@@ -17,43 +15,45 @@ import { User } from 'src/user/decorator/user.decorator';
 import { PostDto } from './dto/post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { TwosdayPostService } from './post.service';
+import { UserModel } from '@/user/entities/user.entity';
 
 @Controller('api/twosday')
 export class TwosdayPostController {
   constructor(private readonly twosdayPostService: TwosdayPostService) {}
 
   @Get('post')
-  @UseGuards(PublicUserGuard)
   async getAllPost() {
     const posts = await this.twosdayPostService.getAllPosts();
-    return { posts };
+    return { data: { posts }, message: ['게시글이 조회되었습니다.'] };
   }
 
   @Get('post/:id')
-  @UseGuards(PublicUserGuard)
   async getPostsById(@Param('id', ParseIntPipe) id: number) {
     const post = await this.twosdayPostService.getPostById(id);
-    return { post };
+    return { data: post, message: ['게시글이 조회되었습니다.'] };
   }
 
   @Post('post')
-  @UseGuards(ActivatedUserGuard)
-  postPosts(@User('id') userId: number, @Body() postDto: PostDto) {
-    return this.twosdayPostService.createPost(userId, postDto);
+  @UseGuards(AccessGuard)
+  async postPosts(@User('id') userId: number, @Body() postDto: PostDto) {
+    await this.twosdayPostService.createPost(userId, postDto);
+    return { data: null, message: ['게시글이 생성되었습니다.'] };
   }
 
   // put   -> 전체 수정, 존재하지 않을시 생성
   // patch -> 일부 수정
   @Patch('post/:id')
-  patchPostsById(
+  async patchPostsById(
     @Param('id', ParseIntPipe) id: number,
     @Body() postDto: UpdatePostDto,
   ) {
-    return this.twosdayPostService.updatePost(id, postDto);
+    await this.twosdayPostService.updatePost(id, postDto);
+    return { data: null, message: ['게시글이 수정되었습니다.'] };
   }
 
   @Delete('post/:id')
-  deletePostsById(@Param('id', ParseIntPipe) id: number) {
-    return this.twosdayPostService.deletePost(id);
+  async deletePostsById(@Param('id', ParseIntPipe) id: number) {
+    await this.twosdayPostService.deletePost(id);
+    return { data: null, message: ['게시글이 삭제되었습니다.'] };
   }
 }
