@@ -18,11 +18,6 @@ export class SocialUserDto {
 
 export class PatchSocialUserDto {
   @IsString()
-  @IsEmail()
-  @ApiProperty({ example: 'example@naver.com' })
-  email: string;
-
-  @IsString()
   @Length(1, 20)
   @ApiProperty()
   nickname: string;

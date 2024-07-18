@@ -30,11 +30,6 @@ export class PostVerificationDto {
 
 export class PatchEmailUserDto {
   @IsString()
-  @IsEmail()
-  @ApiProperty({ example: 'example@naver.com' })
-  email: string;
-
-  @IsString()
   password: string;
 
   @IsString()
