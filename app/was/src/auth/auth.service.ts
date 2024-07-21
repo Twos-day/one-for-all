@@ -120,20 +120,16 @@ export class AuthService {
 
     if (user.accountType && user.accountType !== AccountType.email) {
       const cause = '이메일 계정으로 가입된 사용자가 아닙니다.';
-      return req.res.redirect(
-        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
-      );
+      throw new UnauthorizedException(cause);
     }
 
     if (user.status === StatusEnum.deactivated) {
       const cause = '접근할 수 없는 계정입니다.';
-      return req.res.redirect(
-        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
-      );
+      throw new UnauthorizedException(cause);
     }
 
     if (user.status !== StatusEnum.unauthorized) {
-      throw new BadRequestException('이미 가입된 사용자입니다.');
+      throw new UnauthorizedException('이미 가입된 사용자입니다.');
     }
   }
 
