@@ -77,10 +77,7 @@ export class AuthController {
   }
 
   @Post('signup')
-  async postSignupEmail(
-    @Body() emailUser: PostEmailUserDto,
-    @Req() req: Request,
-  ) {
+  async postSignupEmail(@Body() emailUser: PostEmailUserDto) {
     let user = await this.userService.getUserByEmail(emailUser.email);
 
     if (!user) {
@@ -88,7 +85,7 @@ export class AuthController {
       user = await this.userService.registerUser(emailUser);
     }
 
-    this.authService.verifyEmailUser(req, user);
+    this.authService.verifyEmailUser(user);
     return {
       data: { id: user.id },
       message: ['사용자정보 추가등록을 진행합니다.'],

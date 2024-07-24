@@ -23,7 +23,7 @@ export default function LoginForm() {
     onSuccess: ({ data }) => {
       const redirect = getCookieValue("redirect") || "https://twosday.live";
       document.cookie = `refreshToken=${data.token}; domain=twosday.live`;
-      document.cookie = "redirect=; Max-Age=0; path=/;"; // delete cookie
+      document.cookie = "redirect=; Max-Age=0; domain=twosday.live"; // delete cookie
       window.location.href = redirect;
     },
     onError: async (error) => {

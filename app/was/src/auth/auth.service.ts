@@ -7,7 +7,6 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bycrypt from 'bcrypt';
 import { UserModel } from 'src/user/entities/user.entity';
@@ -31,7 +30,6 @@ export class AuthService {
   constructor(
     private readonly jwrService: JwtService,
     private readonly userService: UserService,
-    private readonly configService: ConfigService,
   ) {}
 
   /** true일시 bearer 토큰 */
@@ -110,15 +108,21 @@ export class AuthService {
       // 로그인 처리
       const refreshToken = this.generateRefreshToken(user);
       this.setRefreshToken(req.res, refreshToken);
+
+      // delete cookie
+      req.res.cookie('redirect', '', {
+        httpOnly: true,
+        domain: excuteRootDomain(process.env.HOST),
+        secure: process.env.PROTOCOL === 'https',
+        maxAge: 0,
+      });
       return req.res.redirect(`${redirectUrl}`);
     }
 
     throw new InternalServerErrorException('관리자에게 문의하세요.');
   }
 
-  verifyEmailUser(req: Request, user: UserModel): void {
-    const redirectUrl: string = req.cookies.redirect || getServerUrl();
-
+  verifyEmailUser(user: UserModel): void {
     if (user.accountType && user.accountType !== AccountType.email) {
       const cause = '이메일 계정으로 가입된 사용자가 아닙니다.';
       throw new UnauthorizedException(cause);
@@ -199,6 +203,7 @@ export class AuthService {
       httpOnly: true,
       domain: excuteRootDomain(process.env.HOST),
       secure: process.env.PROTOCOL === 'https',
+      maxAge: 1000 * 60 * 60 * 24 * 3, // 3일
     });
   }
 
