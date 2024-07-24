@@ -3,7 +3,8 @@ import AuthButtonGroup from "./_component/AuthButtonGroup";
 import { LoaderFunctionArgs, redirect } from "react-router-dom";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const redirectUrl = new URL(request.url).searchParams.get("redirect") || "https://twosday.live";
+  const redirectUrl =
+    new URL(request.url).searchParams.get("redirect") || "http://one-for-all.twosday.live";
   const hostname = new URL(redirectUrl).hostname;
 
   if (!hostname.endsWith("twosday.live") && hostname !== "localhost") {
