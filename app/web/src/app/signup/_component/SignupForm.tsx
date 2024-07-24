@@ -1,4 +1,3 @@
-"use client";
 import ResetButton from "@/app/_component/btn/ResetBtn";
 import DotsLoading from "@/app/_component/loading/DotsLoading";
 import ErrorModal from "@/app/_component/modal/ErrorModal";

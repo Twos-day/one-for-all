@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import * as css from "./signupForm.css";
 import { SIGNUP_EMAIL_PAGE_VALUES, useSetSignupEmail, useSignupEmailStore } from "../_lib/store";

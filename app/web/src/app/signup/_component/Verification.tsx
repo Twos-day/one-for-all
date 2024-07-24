@@ -1,4 +1,3 @@
-"use client";
 import DotsLoading from "@/app/_component/loading/DotsLoading";
 import { SIGNUP_EMAIL_PAGE_VALUES, useSetSignupEmail, useSignupEmailStore } from "../_lib/store";
 import * as css from "./signupForm.css";

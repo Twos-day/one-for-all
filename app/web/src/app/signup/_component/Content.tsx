@@ -1,5 +1,3 @@
-"use client";
-
 import { SIGNUP_EMAIL_PAGE_VALUES, useSignupEmailStore } from "../_lib/store";
 import EmailConfirm from "../_component/EmailConfirm";
 import SignupForm from "../_component/SignupForm";
