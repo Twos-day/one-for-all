@@ -1,5 +1,4 @@
 import { AccessGuard } from '@/auth/guard/after-login.guard';
-import { PublicAccessGuard } from '@/auth/guard/before-login.guard';
 import {
   Body,
   Controller,
@@ -15,7 +14,6 @@ import { User } from 'src/user/decorator/user.decorator';
 import { PostDto } from './dto/post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { TwosdayPostService } from './post.service';
-import { UserModel } from '@/user/entities/user.entity';
 
 @Controller('api/twosday')
 export class TwosdayPostController {

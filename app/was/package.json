@@ -10,6 +10,10 @@
     "start:debug": "cross-env NODE_ENV=local nest start --debug --watch",
     "start:local": "pm2 start ecosystem.config.js --env local",
     "start:prod": "pm2 start ecosystem.config.js --env prod",
+    "typeorm": "node -r tsconfig-paths/register -r ts-node/register ./node_modules/typeorm/cli.js --dataSource ./data-source.ts",
+    "typeorm:create": "pnpm typeorm migration:create ./migration/migration",
+    "typeorm:generate": "pnpm typeorm migration:generate ./migration/migration",
+    "typeorm:run": "pnpm typeorm migration:run",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -60,6 +64,7 @@
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-kakao": "^1.0.3",
     "@types/supertest": "^6.0.0",
+    "dotenv": "^16.4.5",
     "source-map-support": "^0.5.21",
     "supertest": "^6.3.3",
     "tsconfig-paths": "^4.2.0"

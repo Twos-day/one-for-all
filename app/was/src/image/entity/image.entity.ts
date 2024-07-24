@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
-import { BaseModel } from 'src/common/entity/base.entity';
-import { UserModel } from 'src/user/entities/user.entity';
+import { BaseModel } from '@/common/entity/base.entity';
+import { UserModel } from '@/user/entities/user.entity';
 import { Column, Entity, ManyToOne } from 'typeorm';
 
 @Entity()
