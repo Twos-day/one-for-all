@@ -21,7 +21,7 @@ export default function LoginForm() {
     mutationFn: emailLoginFn,
     onMutate: () => setIsLoading(() => true),
     onSuccess: ({ data }) => {
-      const redirect = getCookieValue("redirect") || "https://twosday.live";
+      const redirect = getCookieValue("redirect") || "https://one-for-all.twosday.live";
       document.cookie = `refreshToken=${data.token}; domain=twosday.live`;
       document.cookie = "redirect=; Max-Age=0; domain=twosday.live"; // delete cookie
       window.location.href = redirect;
