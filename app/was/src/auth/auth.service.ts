@@ -76,19 +76,20 @@ export class AuthService {
       // 유저가 없으면 새로 생성
       user = await this.userService.registerUser(socialUser);
     }
-    const redirectUrl: string = req.cookies.redirect || getServerUrl();
+    const serverUrl = getServerUrl();
+    const redirectUrl: string = req.cookies.redirect || serverUrl;
 
     if (user.accountType && user.accountType !== accountType) {
       const cause = `${accountType.toUpperCase()} 계정으로 가입된 사용자가 아닙니다.`;
       return req.res.redirect(
-        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+        `${serverUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
       );
     }
 
     if (user.status === StatusEnum.deactivated) {
       const cause = '접근할 수 없는 계정입니다.';
       return req.res.redirect(
-        `${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+        `${serverUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
       );
     }
 
@@ -99,7 +100,7 @@ export class AuthService {
       user.avatar = socialUser.avatar;
       user.nickname = socialUser.nickname;
       const token = this.generateRefreshToken(user);
-      return req.res.redirect(`${redirectUrl}/signup/register?token=${token}`);
+      return req.res.redirect(`${serverUrl}/signup/register?token=${token}`);
     }
 
     if (
@@ -194,7 +195,7 @@ export class AuthService {
   }
 
   setRefreshToken(res: Response, token: string) {
-    res.cookie('', token, {
+    res.cookie('refreshToken', token, {
       httpOnly: true,
       domain: excuteRootDomain(process.env.HOST),
       secure: process.env.PROTOCOL === 'https',

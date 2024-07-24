@@ -166,7 +166,7 @@ export class AuthController {
 
   @UseGuards(BasicTokenGuard)
   @Post('email')
-  async postLoginEmail(@User() user: UserModel, @Req() req: Request) {
+  async postLoginEmail(@User() user: UserModel) {
     const token = this.authService.generateRefreshToken(user);
     return { data: { token }, message: ['로그인 되었습니다.'] };
   }
