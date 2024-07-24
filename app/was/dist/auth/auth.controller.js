@@ -89,13 +89,12 @@ let AuthController = class AuthController {
         return { data: null, message: ['회원가입이 완료 되었습니다.'] };
     }
     async postLoginEmail(user, req) {
-        const refreshToken = this.authService.generateRefreshToken(user);
-        this.authService.setRefreshToken(req.res, refreshToken);
-        return { data: null, message: ['로그인 되었습니다.'] };
+        const token = this.authService.generateRefreshToken(user);
+        return { data: { token }, message: ['로그인 되었습니다.'] };
     }
     async getSession(user) {
         const session = this.authService.createSession(user);
-        return { data: session, message: ['세션이 조회되었습니다.'] };
+        return { data: { session }, message: ['세션이 조회되었습니다.'] };
     }
     async deleteUser(id) {
         await this.userService.deleteUser(id);

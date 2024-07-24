@@ -55,21 +55,25 @@ export declare class AuthController {
         message: string[];
     }>;
     postLoginEmail(user: UserModel, req: Request): Promise<{
-        data: any;
+        data: {
+            token: string;
+        };
         message: string[];
     }>;
     getSession(user: UserModel): Promise<{
         data: {
-            accessToken: string;
-            id: number;
-            email: string;
-            avatar: string | null;
-            nickname: string;
-            accountType: AccountType;
-            level: number;
-            status: import("../user/const/status.const").StatusEnum;
-            createdAt: Date;
-            updatedAt: Date;
+            session: {
+                accessToken: string;
+                id: number;
+                email: string;
+                avatar: string | null;
+                nickname: string;
+                accountType: AccountType;
+                level: number;
+                status: import("../user/const/status.const").StatusEnum;
+                createdAt: Date;
+                updatedAt: Date;
+            };
         };
         message: string[];
     }>;

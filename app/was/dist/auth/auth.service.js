@@ -133,7 +133,7 @@ let AuthService = class AuthService {
         return refreshToken;
     }
     setRefreshToken(res, token) {
-        res.cookie('refreshToken', token, {
+        res.cookie('', token, {
             httpOnly: true,
             domain: (0, excute_root_domain_1.excuteRootDomain)(process.env.HOST),
             secure: process.env.PROTOCOL === 'https',
