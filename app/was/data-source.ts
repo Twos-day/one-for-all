@@ -2,7 +2,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { config } from 'dotenv';
 import { resolve } from 'path';
 
-config({ path: resolve(__dirname, '.env.local') });
+config({ path: resolve(__dirname, '.env.prod') });
 
 const options: DataSourceOptions = {
   type: 'postgres',

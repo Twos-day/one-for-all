@@ -9,7 +9,6 @@ import {
 import { TwosdayReferenceService } from './reference.service';
 import { CreateReferenceDto } from './dto/create-reference.dto';
 import { Info } from './type/info.type';
-import { count } from 'console';
 
 @Controller('api/twosday')
 export class TwosdayReferenceController {
@@ -40,8 +39,8 @@ export class TwosdayReferenceController {
       info = await this.referenceService.crawlingUrl(body.url);
     }
 
-    const result = await this.referenceService.createReference(info);
+    await this.referenceService.createReference(info);
 
-    return { message: ['레퍼런스가 저장되었습니다.'], data: result };
+    return { message: ['레퍼런스가 저장되었습니다.'] };
   }
 }

@@ -4,11 +4,14 @@ import { Column, Entity } from 'typeorm';
 @Entity('twosday_reference')
 export class TwosdayReferenceModel extends BaseModel {
   @Column()
-  url: string;
+  title: string;
+
+  @Column()
+  description: string;
 
   @Column()
   thumbnail: string;
 
   @Column()
-  description: string;
+  url: string;
 }

@@ -68,7 +68,7 @@ exports.AppModule = AppModule = __decorate([
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_DATABASE,
                 entities: [__dirname + '/**/*.entity.{js,ts}'],
-                synchronize: false,
+                synchronize: process.env.NODE_ENV === 'local',
             }),
             user_module_1.UserModule,
             auth_module_1.AuthModule,

@@ -46,7 +46,7 @@ import { MailModule } from './mail/mail.module';
       password: process.env.DB_PASSWORD,
       database: process.env.DB_DATABASE,
       entities: [__dirname + '/**/*.entity.{js,ts}'],
-      synchronize: false,
+      synchronize: process.env.NODE_ENV === 'local',
     }),
     UserModule,
     AuthModule,

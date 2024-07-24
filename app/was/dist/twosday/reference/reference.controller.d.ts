@@ -13,6 +13,5 @@ export declare class TwosdayReferenceController {
     }>;
     post(body: CreateReferenceDto): Promise<{
         message: string[];
-        data: import("./entities/reference.entity").TwosdayReferenceModel;
     }>;
 }

@@ -18,7 +18,11 @@ exports.TwosdayReferenceModel = TwosdayReferenceModel;
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], TwosdayReferenceModel.prototype, "url", void 0);
+], TwosdayReferenceModel.prototype, "title", void 0);
+__decorate([
+    (0, typeorm_1.Column)(),
+    __metadata("design:type", String)
+], TwosdayReferenceModel.prototype, "description", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
@@ -26,7 +30,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], TwosdayReferenceModel.prototype, "description", void 0);
+], TwosdayReferenceModel.prototype, "url", void 0);
 exports.TwosdayReferenceModel = TwosdayReferenceModel = __decorate([
     (0, typeorm_1.Entity)('twosday_reference')
 ], TwosdayReferenceModel);

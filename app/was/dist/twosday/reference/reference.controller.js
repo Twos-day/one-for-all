@@ -40,8 +40,8 @@ let TwosdayReferenceController = class TwosdayReferenceController {
         else {
             info = await this.referenceService.crawlingUrl(body.url);
         }
-        const result = await this.referenceService.createReference(info);
-        return { message: ['레퍼런스가 저장되었습니다.'], data: result };
+        await this.referenceService.createReference(info);
+        return { message: ['레퍼런스가 저장되었습니다.'] };
     }
 };
 exports.TwosdayReferenceController = TwosdayReferenceController;

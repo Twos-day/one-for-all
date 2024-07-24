@@ -69,7 +69,15 @@ export class TwosdayReferenceService {
     const PAGE_SIZE = 10;
 
     return this.referenceRepository.findAndCount({
-      select: ["id", 'url', 'thumbnail', 'description', 'createdAt', 'updatedAt'],
+      select: [
+        'id',
+        'title',
+        'description',
+        'thumbnail',
+        'url',
+        'createdAt',
+        'updatedAt',
+      ],
       skip: page < 2 ? 0 : (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     });

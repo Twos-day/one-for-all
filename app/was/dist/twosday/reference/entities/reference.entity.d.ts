@@ -1,6 +1,7 @@
 import { BaseModel } from '@/common/entity/base.entity';
 export declare class TwosdayReferenceModel extends BaseModel {
-    url: string;
-    thumbnail: string;
+    title: string;
     description: string;
+    thumbnail: string;
+    url: string;
 }
