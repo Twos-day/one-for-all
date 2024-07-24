@@ -1,18 +1,16 @@
 import * as css from "./page.css";
 import AuthButtonGroup from "./_component/AuthButtonGroup";
 import { LoaderFunctionArgs, redirect } from "react-router-dom";
-import { excuteRootDomain } from "../_lib/excuteDomain";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const redirectUrl = new URL(request.url).searchParams.get("redirect") || window.location.href;
+  const redirectUrl = new URL(request.url).searchParams.get("redirect") || request.url;
   const hostname = new URL(redirectUrl).hostname;
-  const domain = new URL(request.url).hostname;
 
   if (!hostname.endsWith("twosday.live") && hostname !== "localhost") {
     return redirect("/login");
   }
 
-  document.cookie = `redirect=${redirectUrl}; domain=${excuteRootDomain(domain)}`;
+  document.cookie = `redirect=${redirectUrl}; domain=twosday.live`;
   return true;
 };
 

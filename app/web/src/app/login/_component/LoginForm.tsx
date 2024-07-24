@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 import emailLoginFn from "../_lib/login";
 import * as css from "./loginForm.css";
 import { getCookieValue } from "@/app/_lib/getCookie";
-import { excuteRootDomain } from "@/app/_lib/excuteDomain";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -23,8 +22,8 @@ export default function LoginForm() {
     onMutate: () => setIsLoading(() => true),
     onSuccess: ({ data }) => {
       const redirect = getCookieValue("redirect") || "https://twosday.live";
-      const domain = new URL(redirect).hostname;
-      document.cookie = `refreshToken=${data.token}; domain=${excuteRootDomain(domain)}`;
+      document.cookie = `refreshToken=${data.token}; domain=twosday.live`;
+      document.cookie = "redirect=; Max-Age=0; path=/;"; // delete cookie
       window.location.href = redirect;
     },
     onError: async (error) => {
