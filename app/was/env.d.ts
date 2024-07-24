@@ -24,7 +24,7 @@ declare global {
       readonly AWS_S3_SECRET_KEY: string;
       readonly AWS_S3_BUCKET_NAME: string;
 
-      // PASSPORT
+      readonly GOOGLE_API_KEY: string;
       readonly GOOGLE_CLIENT_ID: string;
       readonly GOOGLE_CLIENT_SECRET: string;
       readonly KAKAO_CLIENT_ID: string;
