@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import emailLoginFn from "../_lib/login";
 import * as css from "./loginForm.css";
 import { getCookieValue } from "@/app/_lib/getCookie";
+import { excuteRootDomain } from "@/app/_lib/excuteDomain";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function LoginForm() {
     onSuccess: ({ data }) => {
       const redirect = getCookieValue("redirect") || "https://twosday.live";
       const domain = new URL(redirect).hostname;
-      document.cookie = `refreshToken=${data.token}; domain=${domain}`;
+      document.cookie = `refreshToken=${data.token}; domain=${excuteRootDomain(domain)}`;
       window.location.href = redirect;
     },
     onError: async (error) => {

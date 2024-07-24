@@ -8,7 +8,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const hostname = new URL(redirectUrl).hostname;
   const domain = new URL(request.url).hostname;
 
-  if (hostname.endsWith("twosday.live") && hostname !== "localhost") {
+  if (!hostname.endsWith("twosday.live") && hostname !== "localhost") {
     return redirect("/login");
   }
 
