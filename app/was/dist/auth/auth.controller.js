@@ -88,7 +88,7 @@ let AuthController = class AuthController {
         this.authService.setRefreshToken(req.res, token);
         return { data: null, message: ['회원가입이 완료 되었습니다.'] };
     }
-    async postLoginEmail(user, req) {
+    async postLoginEmail(user) {
         const token = this.authService.generateRefreshToken(user);
         return { data: { token }, message: ['로그인 되었습니다.'] };
     }
@@ -190,9 +190,8 @@ __decorate([
     (0, common_1.UseGuards)(before_login_guard_1.BasicTokenGuard),
     (0, common_1.Post)('email'),
     __param(0, (0, user_decorator_1.User)()),
-    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_entity_1.UserModel, Object]),
+    __metadata("design:paramtypes", [user_entity_1.UserModel]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "postLoginEmail", null);
 __decorate([

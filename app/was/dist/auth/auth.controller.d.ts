@@ -54,7 +54,7 @@ export declare class AuthController {
         data: any;
         message: string[];
     }>;
-    postLoginEmail(user: UserModel, req: Request): Promise<{
+    postLoginEmail(user: UserModel): Promise<{
         data: {
             token: string;
         };

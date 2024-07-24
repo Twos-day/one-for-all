@@ -51,21 +51,22 @@ let AuthService = class AuthService {
         if (!user) {
             user = await this.userService.registerUser(socialUser);
         }
-        const redirectUrl = req.cookies.redirect || (0, getServerUrl_1.getServerUrl)();
+        const serverUrl = (0, getServerUrl_1.getServerUrl)();
+        const redirectUrl = req.cookies.redirect || serverUrl;
         if (user.accountType && user.accountType !== accountType) {
             const cause = `${accountType.toUpperCase()} 계정으로 가입된 사용자가 아닙니다.`;
-            return req.res.redirect(`${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`);
+            return req.res.redirect(`${serverUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`);
         }
         if (user.status === status_const_1.StatusEnum.deactivated) {
             const cause = '접근할 수 없는 계정입니다.';
-            return req.res.redirect(`${redirectUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`);
+            return req.res.redirect(`${serverUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`);
         }
         if (user.status === status_const_1.StatusEnum.unauthorized) {
             user.accountType = accountType;
             user.avatar = socialUser.avatar;
             user.nickname = socialUser.nickname;
             const token = this.generateRefreshToken(user);
-            return req.res.redirect(`${redirectUrl}/signup/register?token=${token}`);
+            return req.res.redirect(`${serverUrl}/signup/register?token=${token}`);
         }
         if (user.accountType === accountType &&
             user.status === status_const_1.StatusEnum.activated) {
@@ -133,7 +134,7 @@ let AuthService = class AuthService {
         return refreshToken;
     }
     setRefreshToken(res, token) {
-        res.cookie('', token, {
+        res.cookie('refreshToken', token, {
             httpOnly: true,
             domain: (0, excute_root_domain_1.excuteRootDomain)(process.env.HOST),
             secure: process.env.PROTOCOL === 'https',
