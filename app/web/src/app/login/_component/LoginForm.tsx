@@ -7,6 +7,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import emailLoginFn from "../_lib/login";
 import * as css from "./loginForm.css";
+import { getCookieValue } from "@/app/_lib/getCookie";
 
 export default function LoginForm() {
   const navigate = useNavigate();
@@ -18,10 +19,12 @@ export default function LoginForm() {
   const mutateEmailLogin = useMutation({
     mutationKey: ["/api/auth/email"],
     mutationFn: emailLoginFn,
-    // onMutate: () => setIsLoading(() => true),
-    onSuccess: () => {
-      // 로그인이 성공해도 화면이 전환될때까지 로딩처리
-      window.location.reload();
+    onMutate: () => setIsLoading(() => true),
+    onSuccess: ({ data }) => {
+      const redirect = getCookieValue("redirect") || "https://twosday.live";
+      const domain = new URL(redirect).hostname;
+      document.cookie = `refreshToken=${data.token}; domain=${domain}`;
+      window.location.href = redirect;
     },
     onError: async (error) => {
       await modalStore.push(ErrorModal, { props: { error } });

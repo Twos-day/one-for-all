@@ -21,10 +21,10 @@ const emailLoginFn = async ({ email, password }: { email: string; password: stri
     credentials: "include",
   });
 
-  const body = await res.json();
+  const body: { data: { token: string }; message: string[] } = await res.json();
 
   if (!res.ok) {
-    throw new Error(body.message);
+    throw new Error(body.message[0]);
   }
 
   return body;

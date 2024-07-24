@@ -167,9 +167,8 @@ export class AuthController {
   @UseGuards(BasicTokenGuard)
   @Post('email')
   async postLoginEmail(@User() user: UserModel, @Req() req: Request) {
-    const refreshToken = this.authService.generateRefreshToken(user);
-    this.authService.setRefreshToken(req.res, refreshToken);
-    return { data: null, message: ['로그인 되었습니다.'] };
+    const token = this.authService.generateRefreshToken(user);
+    return { data: { token }, message: ['로그인 되었습니다.'] };
   }
 
   @Get('session')
@@ -185,7 +184,7 @@ export class AuthController {
   @UseGuards(SessoionUserGuard)
   async getSession(@User() user: UserModel) {
     const session = this.authService.createSession(user);
-    return { data: session, message: ['세션이 조회되었습니다.'] };
+    return { data: { session }, message: ['세션이 조회되었습니다.'] };
   }
 
   /** 유저정보 수정 */

@@ -194,7 +194,7 @@ export class AuthService {
   }
 
   setRefreshToken(res: Response, token: string) {
-    res.cookie('refreshToken', token, {
+    res.cookie('', token, {
       httpOnly: true,
       domain: excuteRootDomain(process.env.HOST),
       secure: process.env.PROTOCOL === 'https',
