@@ -13,17 +13,15 @@ exports.AuthService = void 0;
 const account_type_const_1 = require("../user/const/account-type.const");
 const status_const_1 = require("../user/const/status.const");
 const common_1 = require("@nestjs/common");
-const config_1 = require("@nestjs/config");
 const jwt_1 = require("@nestjs/jwt");
 const bycrypt = require("bcrypt");
 const user_service_1 = require("../user/user.service");
 const excute_root_domain_1 = require("./util/excute-root-domain");
 const getServerUrl_1 = require("../common/util/getServerUrl");
 let AuthService = class AuthService {
-    constructor(jwrService, userService, configService) {
+    constructor(jwrService, userService) {
         this.jwrService = jwrService;
         this.userService = userService;
-        this.configService = configService;
     }
     extractTokenFromReq(req, isBearer) {
         const rawToken = req.headers.authorization;
@@ -72,12 +70,17 @@ let AuthService = class AuthService {
             user.status === status_const_1.StatusEnum.activated) {
             const refreshToken = this.generateRefreshToken(user);
             this.setRefreshToken(req.res, refreshToken);
+            req.res.cookie('redirect', '', {
+                httpOnly: true,
+                domain: (0, excute_root_domain_1.excuteRootDomain)(process.env.HOST),
+                secure: process.env.PROTOCOL === 'https',
+                maxAge: 0,
+            });
             return req.res.redirect(`${redirectUrl}`);
         }
         throw new common_1.InternalServerErrorException('관리자에게 문의하세요.');
     }
-    verifyEmailUser(req, user) {
-        const redirectUrl = req.cookies.redirect || (0, getServerUrl_1.getServerUrl)();
+    verifyEmailUser(user) {
         if (user.accountType && user.accountType !== account_type_const_1.AccountType.email) {
             const cause = '이메일 계정으로 가입된 사용자가 아닙니다.';
             throw new common_1.UnauthorizedException(cause);
@@ -138,6 +141,7 @@ let AuthService = class AuthService {
             httpOnly: true,
             domain: (0, excute_root_domain_1.excuteRootDomain)(process.env.HOST),
             secure: process.env.PROTOCOL === 'https',
+            maxAge: 1000 * 60 * 60 * 24 * 3,
         });
     }
     createSession(user) {
@@ -163,7 +167,6 @@ exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [jwt_1.JwtService,
-        user_service_1.UserService,
-        config_1.ConfigService])
+        user_service_1.UserService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

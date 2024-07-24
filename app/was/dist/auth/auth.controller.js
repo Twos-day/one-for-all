@@ -44,12 +44,12 @@ let AuthController = class AuthController {
     kakaoAuthRedirect(kakaoUser, req) {
         return this.authService.veryfySocialUser(req, kakaoUser, account_type_const_1.AccountType.kakao);
     }
-    async postSignupEmail(emailUser, req) {
+    async postSignupEmail(emailUser) {
         let user = await this.userService.getUserByEmail(emailUser.email);
         if (!user) {
             user = await this.userService.registerUser(emailUser);
         }
-        this.authService.verifyEmailUser(req, user);
+        this.authService.verifyEmailUser(user);
         return {
             data: { id: user.id },
             message: ['사용자정보 추가등록을 진행합니다.'],
@@ -137,9 +137,8 @@ __decorate([
 __decorate([
     (0, common_1.Post)('signup'),
     __param(0, (0, common_1.Body)()),
-    __param(1, (0, common_1.Req)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [email_user_dto_1.PostEmailUserDto, Object]),
+    __metadata("design:paramtypes", [email_user_dto_1.PostEmailUserDto]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "postSignupEmail", null);
 __decorate([

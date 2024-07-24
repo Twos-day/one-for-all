@@ -15,7 +15,7 @@ export declare class AuthController {
     googleAuthRedirect(googleUser: SocialUserDto, req: Request): Promise<void>;
     kakaoAuth(): Promise<void>;
     kakaoAuthRedirect(kakaoUser: SocialUserDto, req: Request): Promise<void>;
-    postSignupEmail(emailUser: PostEmailUserDto, req: Request): Promise<{
+    postSignupEmail(emailUser: PostEmailUserDto): Promise<{
         data: {
             id: number;
         };
