@@ -1,49 +1,27 @@
-import { Suspense } from "react";
-import { Await, defer, useLoaderData, redirect } from "react-router-dom";
+import * as css from "./page.css";
+import { Navigate, useSearchParams } from "react-router-dom";
+import { useQueryGetVerification } from "../_lib/signup";
+import RegisterForm from "./_component/RegisterForm";
 
-export const loader = async ({ request }: { request: Request }) => {
-  const url = new URL(request.url);
-  const token = url.searchParams.get("token");
+interface PageProps {}
 
-  if (!token) {
-    return redirect("/not-found");
-  }
+export default function Page() {
+  const [searchParams] = useSearchParams();
 
-  //data fetching
-  return defer({
-    data: new Promise((resolve) => {
-      setTimeout(() => {
-        resolve("ok");
-      }, 3000);
-    }),
-  });
-};
+  const token = searchParams.get("token");
 
-// function Form() {
-//   const { data } = useSuspenseQuery({
-//     queryKey: ["test"],
-//     queryFn: async () => {
-//       return new Promise((resolve, reject) => {
-//         setTimeout(() => {
-//           reject("ok");
-//         }, 1000);
-//       });
-//     },
-//   });
+  const { data, error } = useQueryGetVerification(token);
 
-//   return <div>helloworld</div>;
-// }
-
-export default function Home() {
-  const { data } = useLoaderData() as { data: string };
+  if (data?.data === null) return <Navigate to="/signup" />;
+  if (error) throw error;
+  if (data?.data === undefined) return <div>로딩중...</div>;
 
   return (
-    <div>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={data} errorElement={<div>Someting wrong!</div>}>
-          Hello world!
-        </Await>
-      </Suspense>
-    </div>
+    <main className={css.main}>
+      <div className={css.inner}>
+        <h1 className={css.title}>회원가입</h1>
+        <RegisterForm data={data.data} />
+      </div>
+    </main>
   );
 }
