@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { vanillaExtractPlugin } from "@vanilla-extract/vite-plugin";
 import path from "path";
+import svgr from "vite-plugin-svgr";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -11,6 +12,7 @@ export default defineConfig({
     vanillaExtractPlugin({
       identifiers: ({ hash }) => `css_${hash}`,
     }),
+    svgr(),
   ],
   build: {
     outDir: resolve(__dirname, "../was/public"),
@@ -25,7 +27,7 @@ export default defineConfig({
     port: 3000,
     proxy: {
       "/api": {
-        target: "http://localhost:8080/api",
+        target: "https://one-for-all.twosday.live/api",
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

@@ -3,6 +3,7 @@ import Notfound from "./notFound/page";
 import { signupRoute } from "./signup/route";
 import { loadPage } from "@/app/_lib/loadPage";
 import RootLayout from "./RootLayout";
+import { loginRoute } from "./login/route";
 
 const router = createBrowserRouter(
   [
@@ -14,10 +15,7 @@ const router = createBrowserRouter(
           index: true,
           lazy: () => loadPage(import("./home/page")),
         },
-        {
-          path: "/login",
-          lazy: () => loadPage(import("./login/page")),
-        },
+        ...loginRoute,
         ...signupRoute,
         {
           path: "*", // 404 Not Found

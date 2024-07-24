@@ -13,9 +13,7 @@ export default function RootLayout({}: RootLayoutProps) {
     <HelmetProvider>
       <HotkeysProvider>
         <ReactQuery>
-          <header>header</header>
           <Outlet />
-          <footer>footer</footer>
           <ReactQueryDevtools buttonPosition="bottom-right" position="bottom" />
           <ModalContainer />
           <ToastBox />
