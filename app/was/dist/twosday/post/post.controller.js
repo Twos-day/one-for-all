@@ -32,16 +32,16 @@ let TwosdayPostController = class TwosdayPostController {
         return { data: post, message: ['게시글이 조회되었습니다.'] };
     }
     async postPosts(userId, postDto) {
-        await this.twosdayPostService.createPost(userId, postDto);
-        return { data: null, message: ['게시글이 생성되었습니다.'] };
+        const result = await this.twosdayPostService.createPost(userId, postDto);
+        return { data: { id: result.id }, message: ['게시글이 생성되었습니다.'] };
     }
     async patchPostsById(id, postDto) {
-        await this.twosdayPostService.updatePost(id, postDto);
-        return { data: null, message: ['게시글이 수정되었습니다.'] };
+        const result = await this.twosdayPostService.updatePost(id, postDto);
+        return { data: { id: result.id }, message: ['게시글이 수정되었습니다.'] };
     }
     async deletePostsById(id) {
-        await this.twosdayPostService.deletePost(id);
-        return { data: null, message: ['게시글이 삭제되었습니다.'] };
+        const result = await this.twosdayPostService.deletePost(id);
+        return { data: { id: result }, message: ['게시글이 삭제되었습니다.'] };
     }
 };
 exports.TwosdayPostController = TwosdayPostController;

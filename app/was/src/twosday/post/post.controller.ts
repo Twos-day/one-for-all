@@ -34,8 +34,8 @@ export class TwosdayPostController {
   @Post('post')
   @UseGuards(AccessGuard)
   async postPosts(@User('id') userId: number, @Body() postDto: PostDto) {
-    await this.twosdayPostService.createPost(userId, postDto);
-    return { data: null, message: ['게시글이 생성되었습니다.'] };
+    const result = await this.twosdayPostService.createPost(userId, postDto);
+    return { data: { id: result.id }, message: ['게시글이 생성되었습니다.'] };
   }
 
   // put   -> 전체 수정, 존재하지 않을시 생성
@@ -45,13 +45,13 @@ export class TwosdayPostController {
     @Param('id', ParseIntPipe) id: number,
     @Body() postDto: UpdatePostDto,
   ) {
-    await this.twosdayPostService.updatePost(id, postDto);
-    return { data: null, message: ['게시글이 수정되었습니다.'] };
+    const result = await this.twosdayPostService.updatePost(id, postDto);
+    return { data: { id: result.id }, message: ['게시글이 수정되었습니다.'] };
   }
 
   @Delete('post/:id')
   async deletePostsById(@Param('id', ParseIntPipe) id: number) {
-    await this.twosdayPostService.deletePost(id);
-    return { data: null, message: ['게시글이 삭제되었습니다.'] };
+    const result = await this.twosdayPostService.deletePost(id);
+    return { data: { id: result }, message: ['게시글이 삭제되었습니다.'] };
   }
 }

@@ -15,15 +15,21 @@ export declare class TwosdayPostController {
         message: string[];
     }>;
     postPosts(userId: number, postDto: PostDto): Promise<{
-        data: any;
+        data: {
+            id: number;
+        };
         message: string[];
     }>;
     patchPostsById(id: number, postDto: UpdatePostDto): Promise<{
-        data: any;
+        data: {
+            id: number;
+        };
         message: string[];
     }>;
     deletePostsById(id: number): Promise<{
-        data: any;
+        data: {
+            id: number;
+        };
         message: string[];
     }>;
 }

@@ -5,7 +5,7 @@ export declare class TwosdayPostModel extends BaseModel {
     author: UserModel;
     tags: TwosdayTagModel[];
     title: string;
-    thumbnail: string;
+    thumbnail: string | null;
     content: string;
     isPublic: boolean;
     viewCount: number;

@@ -15,8 +15,8 @@ export class TwosdayPostModel extends BaseModel {
   @Column({ type: 'varchar', length: 255 })
   title: string;
 
-  @Column()
-  thumbnail: string;
+  @Column({ nullable: true })
+  thumbnail: string | null;
 
   @Column('text')
   content: string;
