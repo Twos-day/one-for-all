@@ -72,6 +72,8 @@ let AuthService = class AuthService {
             this.setRefreshToken(req.res, refreshToken);
             req.res.cookie('redirect', '', {
                 maxAge: 0,
+                domain: (0, excute_root_domain_1.excuteRootDomain)(process.env.HOST),
+                path: '/',
             });
             return req.res.redirect(`${redirectUrl}`);
         }
