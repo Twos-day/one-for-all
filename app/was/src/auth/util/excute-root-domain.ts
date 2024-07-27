@@ -1,14 +1,16 @@
-export const excuteRootDomain = (host: string) => {
-  const parts = host.split('.');
+import { parse } from 'tldts';
 
-  if (parts.length === 1) {
-    return 'localhost';
+export const excuteRootDomain = (url: string) => {
+  if (!url) return 'localhost';
+  const hostname = parse(url).hostname.split('.');
+
+  let rootDomain: string;
+  if (hostname.length < 3) {
+    rootDomain = hostname.join('.');
+  } else {
+    hostname.shift(); // SID 제거
+    rootDomain = hostname.join('.');
   }
 
-  if (parts.length === 2) {
-    return host;
-  }
-
-  parts.shift();
-  return parts.join('.');
+  return rootDomain;
 };

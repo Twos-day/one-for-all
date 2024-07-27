@@ -14,12 +14,13 @@ import {
   ParseIntPipe,
   Post,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as bycrypt from 'bcrypt';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { GoogleUser } from './decorator/google-user.decorator';
 import { KakaoUser } from './decorator/kakao-user.decorator';

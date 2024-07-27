@@ -109,12 +109,8 @@ export class AuthService {
       const refreshToken = this.generateRefreshToken(user);
       this.setRefreshToken(req.res, refreshToken);
 
-      // delete cookie
       req.res.cookie('redirect', '', {
-        httpOnly: true,
-        domain: excuteRootDomain(process.env.HOST),
-        secure: process.env.PROTOCOL === 'https',
-        maxAge: 0,
+        maxAge: 0, // delete cookie
       });
       return req.res.redirect(`${redirectUrl}`);
     }
@@ -203,7 +199,8 @@ export class AuthService {
       httpOnly: true,
       domain: excuteRootDomain(process.env.HOST),
       secure: process.env.PROTOCOL === 'https',
-      maxAge: 1000 * 60 * 60 * 24 * 3, // 3일
+      maxAge: 1000 * 60 * 60 * 24 * 3, // 3일 (밀리초)
+      path: '/',
     });
   }
 

@@ -22,9 +22,13 @@ export default function LoginForm() {
     onMutate: () => setIsLoading(() => true),
     onSuccess: ({ data }) => {
       const redirect = getCookieValue("redirect") || "https://one-for-all.twosday.live";
-      document.cookie = `refreshToken=${data.token}; domain=twosday.live`;
-      document.cookie = "redirect=; Max-Age=0; domain=twosday.live"; // delete cookie
-      window.location.href = redirect;
+      const domain = redirect.endsWith("twosday.live") ? "twosday.live" : "localhost";
+      const maxAge = 60 * 60 * 24 * 3; // 3일 (초단위)
+      let refreshCookie = `refreshToken=${data.token}; domain=${domain}; path=/; httponly; max-age=${maxAge};`;
+      if (domain !== "localhost") refreshCookie += " secure;";
+      document.cookie = refreshCookie;
+      document.cookie = "redirect=; max-age=0;"; // redirect 쿠키 삭제
+      window.location.href = "/login";
     },
     onError: async (error) => {
       await modalStore.push(ErrorModal, { props: { error } });

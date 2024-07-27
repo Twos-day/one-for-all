@@ -23,6 +23,7 @@ import { LogModule } from './log/log.module';
 import { LogService } from './log/log.service';
 import { TwosdayModule } from './twosday/twosday.module';
 import { MailModule } from './mail/mail.module';
+import { CustomClassSerializerInterceptor } from './common/intercepter/class-serializer.intercepter';
 
 @Module({
   imports: [
@@ -65,7 +66,7 @@ import { MailModule } from './mail/mail.module';
       /**
        *  직렬화 => 현재 시스템에서 사용되는 데이터구조를 다른 시스템에서 사용되는 데이터구조(JSON)로 변환하는 과정
        */
-      useClass: ClassSerializerInterceptor,
+      useClass: CustomClassSerializerInterceptor,
     },
   ],
 })
