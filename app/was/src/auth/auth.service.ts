@@ -111,6 +111,8 @@ export class AuthService {
 
       req.res.cookie('redirect', '', {
         maxAge: 0, // delete cookie
+        domain: excuteRootDomain(process.env.HOST),
+        path: '/',
       });
       return req.res.redirect(`${redirectUrl}`);
     }
