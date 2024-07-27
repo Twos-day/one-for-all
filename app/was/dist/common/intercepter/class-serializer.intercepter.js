@@ -19,10 +19,9 @@ let CustomClassSerializerInterceptor = class CustomClassSerializerInterceptor ex
         };
         const req = context.switchToHttp().getRequest();
         const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-        const pathname = req.originalUrl;
         req.fullUrl = fullUrl;
         return next.handle().pipe((0, operators_1.map)((res) => {
-            if (PASS_THROUGH.includes(pathname))
+            if (PASS_THROUGH.some((path) => path.startsWith(req.originalUrl)))
                 return res;
             return this.serialize(res, options);
         }));

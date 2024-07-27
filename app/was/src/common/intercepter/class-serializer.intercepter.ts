@@ -22,13 +22,13 @@ export class CustomClassSerializerInterceptor extends ClassSerializerInterceptor
     // const res: Response = context.switchToHttp().getResponse();
 
     // Request
-    const pathname = req.originalUrl;
     req.fullUrl = fullUrl;
 
     return next.handle().pipe(
       (0, operators_1.map)((res) => {
         // Response
-        if (PASS_THROUGH.includes(pathname)) return res;
+        if (PASS_THROUGH.some((path) => path.startsWith(req.originalUrl)))
+          return res;
         return this.serialize(res, options);
       }),
     );

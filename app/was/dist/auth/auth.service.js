@@ -135,7 +135,6 @@ let AuthService = class AuthService {
     }
     setRefreshToken(res, token) {
         res.cookie('refreshToken', token, {
-            httpOnly: true,
             domain: (0, excute_root_domain_1.excuteRootDomain)(process.env.HOST),
             secure: process.env.PROTOCOL === 'https',
             maxAge: 1000 * 60 * 60 * 24 * 3,

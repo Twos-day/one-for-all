@@ -196,7 +196,6 @@ export class AuthService {
 
   setRefreshToken(res: Response, token: string) {
     res.cookie('refreshToken', token, {
-      httpOnly: true,
       domain: excuteRootDomain(process.env.HOST),
       secure: process.env.PROTOCOL === 'https',
       maxAge: 1000 * 60 * 60 * 24 * 3, // 3일 (밀리초)
