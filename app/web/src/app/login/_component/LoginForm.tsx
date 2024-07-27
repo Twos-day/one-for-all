@@ -21,13 +21,12 @@ export default function LoginForm() {
     mutationFn: emailLoginFn,
     onMutate: () => setIsLoading(() => true),
     onSuccess: ({ data }) => {
-      const redirect = getCookieValue("redirect") || "https://one-for-all.twosday.live";
-      const domain = redirect.endsWith("twosday.live") ? "twosday.live" : "localhost";
+      const hostname = new URL(window.location.href).hostname;
+      const domain = hostname.endsWith("twosday.live") ? "twosday.live" : "localhost";
       const maxAge = 60 * 60 * 24 * 3; // 3일 (초단위)
       let refreshCookie = `refreshToken=${data.token}; domain=${domain}; path=/; max-age=${maxAge};`;
       if (domain !== "localhost") refreshCookie += " secure;";
       document.cookie = refreshCookie;
-      document.cookie = `redirect=; max-age=0; domain=${domain}; path=/;`; // redirect 쿠키 삭제
       window.location.href = "/login";
     },
     onError: async (error) => {
