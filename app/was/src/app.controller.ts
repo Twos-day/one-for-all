@@ -32,13 +32,19 @@ export class AppController {
     @Url() url: string,
     @Res() res: Response,
   ) {
+    const redirectQuery = this.appService.checkRedirect(redirect)
+      ? redirect
+      : getServerUrl();
+
     const refreshCookie = req.cookies.refreshToken;
     const redirectCookie = req.cookies.redirect;
 
     if (refreshCookie) {
       // 세션이 있을때
       try {
-        const redirectUrl = redirectCookie ? encodeURI(redirectCookie) : '/';
+        const redirectUrl = redirectCookie
+          ? encodeURI(redirectCookie)
+          : redirectQuery;
 
         this.authService.verifyToken(refreshCookie, true);
 
@@ -64,11 +70,8 @@ export class AppController {
       }
     } else {
       // 세션이 없을때
-      const redirectUrl = this.appService.checkRedirect(redirect)
-        ? redirect
-        : getServerUrl();
 
-      res.cookie('redirect', redirectUrl, {
+      res.cookie('redirect', redirectQuery, {
         domain: excuteRootDomain(url),
         path: '/',
       });
