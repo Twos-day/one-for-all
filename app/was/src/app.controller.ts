@@ -33,20 +33,20 @@ export class AppController {
     @Res() res: Response,
   ) {
     const refreshCookie = req.cookies.refreshToken;
-    const redirectCookie = req.cookies.redirect || '/';
-
-    const redirectUrl = this.appService.checkRedirect(redirect)
-      ? redirect
-      : getServerUrl();
+    const redirectCookie = req.cookies.redirect;
 
     if (refreshCookie) {
       // 세션이 있을때
       try {
+        const redirectUrl = redirectCookie ? encodeURI(redirectCookie) : '/';
+
         this.authService.verifyToken(refreshCookie, true);
+
         res.cookie('refreshToken', refreshCookie, {
           domain: excuteRootDomain(redirectUrl),
           path: '/',
         });
+
         res.cookie('redirect', '', {
           domain: excuteRootDomain(url),
           path: '/',
@@ -54,7 +54,7 @@ export class AppController {
         });
 
         // 쿠키에 저장된 경로로 이동
-        return res.redirect(redirectCookie);
+        return res.redirect(redirectUrl);
       } catch (e) {
         // 세션이 만료됐을때
         // 리프레시 토큰 삭제
@@ -67,6 +67,10 @@ export class AppController {
       }
     } else {
       // 세션이 없을때
+      const redirectUrl = this.appService.checkRedirect(redirect)
+        ? redirect
+        : getServerUrl();
+
       res.cookie('redirect', redirectUrl, {
         domain: excuteRootDomain(url),
         path: '/',
