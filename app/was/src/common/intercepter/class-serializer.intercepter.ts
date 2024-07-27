@@ -27,8 +27,9 @@ export class CustomClassSerializerInterceptor extends ClassSerializerInterceptor
     return next.handle().pipe(
       (0, operators_1.map)((res) => {
         // Response
-        if (PASS_THROUGH.some((path) => path.startsWith(req.originalUrl)))
+        if (PASS_THROUGH.some((path) => req.originalUrl.startsWith(path))) {
           return res;
+        }
         return this.serialize(res, options);
       }),
     );
