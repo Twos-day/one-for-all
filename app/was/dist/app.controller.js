@@ -34,10 +34,7 @@ let AppController = class AppController {
             try {
                 const redirectUrl = redirectCookie ? encodeURI(redirectCookie) : '/';
                 this.authService.verifyToken(refreshCookie, true);
-                res.cookie('refreshToken', refreshCookie, {
-                    domain: (0, excute_root_domain_1.excuteRootDomain)(redirectUrl),
-                    path: '/',
-                });
+                this.authService.setRefreshToken(res, refreshCookie);
                 res.cookie('redirect', '', {
                     domain: (0, excute_root_domain_1.excuteRootDomain)(url),
                     path: '/',

@@ -42,10 +42,7 @@ export class AppController {
 
         this.authService.verifyToken(refreshCookie, true);
 
-        res.cookie('refreshToken', refreshCookie, {
-          domain: excuteRootDomain(redirectUrl),
-          path: '/',
-        });
+        this.authService.setRefreshToken(res, refreshCookie);
 
         res.cookie('redirect', '', {
           domain: excuteRootDomain(url),
