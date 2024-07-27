@@ -28,18 +28,24 @@ let AppController = class AppController {
         this.authService = authService;
     }
     async getHello(req, redirect, url, res) {
-        const cookie = req.cookies.refreshToken;
+        const refreshCookie = req.cookies.refreshToken;
+        const redirectCookie = req.cookies.redirect || '/';
         const redirectUrl = this.appService.checkRedirect(redirect)
             ? redirect
             : (0, getServerUrl_1.getServerUrl)();
-        if (cookie) {
+        if (refreshCookie) {
             try {
-                this.authService.verifyToken(cookie, true);
-                res.cookie('refreshToken', cookie, {
+                this.authService.verifyToken(refreshCookie, true);
+                res.cookie('refreshToken', refreshCookie, {
                     domain: (0, excute_root_domain_1.excuteRootDomain)(redirectUrl),
                     path: '/',
                 });
-                return res.redirect(redirectUrl);
+                res.cookie('redirect', '', {
+                    domain: (0, excute_root_domain_1.excuteRootDomain)(url),
+                    path: '/',
+                    maxAge: 0,
+                });
+                return res.redirect(redirectCookie);
             }
             catch (e) {
                 res.cookie('refreshToken', '', {
