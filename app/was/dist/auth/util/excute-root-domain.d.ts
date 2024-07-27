@@ -1,1 +1,1 @@
-export declare const excuteRootDomain: (host: string) => string;
+export declare const excuteRootDomain: (url: string) => string;

@@ -1,3 +1,6 @@
+import { AuthService } from './auth/auth.service';
 export declare class AppService {
-    getHello(): string;
+    private readonly authService;
+    constructor(authService: AuthService);
+    checkRedirect(redirect?: string): boolean;
 }

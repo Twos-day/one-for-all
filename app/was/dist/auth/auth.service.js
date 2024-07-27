@@ -71,9 +71,6 @@ let AuthService = class AuthService {
             const refreshToken = this.generateRefreshToken(user);
             this.setRefreshToken(req.res, refreshToken);
             req.res.cookie('redirect', '', {
-                httpOnly: true,
-                domain: (0, excute_root_domain_1.excuteRootDomain)(process.env.HOST),
-                secure: process.env.PROTOCOL === 'https',
                 maxAge: 0,
             });
             return req.res.redirect(`${redirectUrl}`);
@@ -142,6 +139,7 @@ let AuthService = class AuthService {
             domain: (0, excute_root_domain_1.excuteRootDomain)(process.env.HOST),
             secure: process.env.PROTOCOL === 'https',
             maxAge: 1000 * 60 * 60 * 24 * 3,
+            path: '/',
         });
     }
     createSession(user) {

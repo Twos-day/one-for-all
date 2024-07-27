@@ -27,6 +27,7 @@ const log_module_1 = require("./log/log.module");
 const log_service_1 = require("./log/log.service");
 const twosday_module_1 = require("./twosday/twosday.module");
 const mail_module_1 = require("./mail/mail.module");
+const class_serializer_intercepter_1 = require("./common/intercepter/class-serializer.intercepter");
 let AppModule = class AppModule {
     constructor(logService) {
         this.logService = logService;
@@ -84,7 +85,7 @@ exports.AppModule = AppModule = __decorate([
             app_service_1.AppService,
             {
                 provide: core_1.APP_INTERCEPTOR,
-                useClass: common_1.ClassSerializerInterceptor,
+                useClass: class_serializer_intercepter_1.CustomClassSerializerInterceptor,
             },
         ],
     }),

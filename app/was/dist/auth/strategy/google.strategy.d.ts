@@ -5,7 +5,7 @@ export interface GoogleProfile extends Profile {
     accessToken: string;
     refreshToken: string;
 }
-declare const GoogleStrategy_base: new (...args: any[]) => InstanceType<typeof Strategy>;
+declare const GoogleStrategy_base: new (...args: any[]) => Strategy;
 export declare class GoogleStrategy extends GoogleStrategy_base {
     private readonly authService;
     private readonly userService;

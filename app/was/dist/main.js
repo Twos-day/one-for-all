@@ -8,7 +8,7 @@ const http_exception_filter_1 = require("./http-exception.filter");
 const express_1 = require("express");
 const swagger_1 = require("@nestjs/swagger");
 const cookieParser = require("cookie-parser");
-const logger_middleware_1 = require("./logger.middleware");
+const logger_middleware_1 = require("./log/logger.middleware");
 async function bootstrap() {
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     const { httpAdapter } = app.get(core_1.HttpAdapterHost);

@@ -5,7 +5,7 @@ export interface KakaoProfile extends Profile {
     accessToken: string;
     refreshToken: string;
 }
-declare const KakaoStrategy_base: new (...args: any[]) => InstanceType<typeof Strategy>;
+declare const KakaoStrategy_base: new (...args: any[]) => Strategy;
 export declare class KakaoStrategy extends KakaoStrategy_base {
     private readonly authService;
     private readonly userService;
