@@ -1,6 +1,7 @@
 import {
   IsArray,
   IsBoolean,
+  IsNumber,
   IsOptional,
   IsString,
   Length,
@@ -22,6 +23,6 @@ export class PostDto {
   isPublic: boolean;
 
   @IsArray()
-  @IsString({ each: true })
-  tags: string[];
+  @IsNumber({}, { each: true })
+  tags: number[];
 }

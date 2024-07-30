@@ -56,12 +56,10 @@ export class TwosdayPostService {
   }
 
   async createPost(authorId: number, postDto: PostDto) {
-    const tagsModel = await this.tagsService.getTags(postDto.tags);
-
     const post = this.postsRepository.create({
       author: { id: authorId },
       ...postDto,
-      tags: tagsModel,
+      tags: postDto.tags.map((tagId) => ({ id: tagId })),
     });
 
     const newPost = await this.postsRepository.save(post);

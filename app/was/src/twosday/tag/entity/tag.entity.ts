@@ -7,11 +7,10 @@ export class TwosdayTagModel extends BaseModel {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({
+    unique: true, // 중복 방지
+  })
   name: string;
-
-  @Column()
-  color: string;
 
   @ManyToMany(() => TwosdayPostModel, (post) => post.tags)
   posts: TwosdayTagModel[];
