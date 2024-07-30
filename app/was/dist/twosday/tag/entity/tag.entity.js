@@ -21,13 +21,11 @@ __decorate([
     __metadata("design:type", Number)
 ], TwosdayTagModel.prototype, "id", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({
+        unique: true,
+    }),
     __metadata("design:type", String)
 ], TwosdayTagModel.prototype, "name", void 0);
-__decorate([
-    (0, typeorm_1.Column)(),
-    __metadata("design:type", String)
-], TwosdayTagModel.prototype, "color", void 0);
 __decorate([
     (0, typeorm_1.ManyToMany)(() => post_entity_1.TwosdayPostModel, (post) => post.tags),
     __metadata("design:type", Array)
