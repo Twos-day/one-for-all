@@ -21,23 +21,24 @@ let TwosdayTagController = class TwosdayTagController {
     constructor(tagService) {
         this.tagService = tagService;
     }
-    async getTags() {
-        return await this.tagService.getTags();
+    async getAllTags() {
+        const tags = await this.tagService.getAllTags();
+        return { data: tags, message: ['태그가 조회되었습니다.'] };
     }
     async postTag(name) {
         const tagModel = await this.tagService.postTag(name);
         return {
             data: { id: tagModel.id, name: tagModel.name },
-            message: ['생성되었습니다.'],
+            message: ['태그가 생성되었습니다.'],
         };
     }
     async patchTag(id, name) {
         await this.tagService.patchTag(id, name);
-        return { data: null, message: ['수정되었습니다.'] };
+        return { data: null, message: ['태그가 수정되었습니다.'] };
     }
     async deleteTag(id) {
         await this.tagService.deleteTag(id);
-        return { data: null, message: ['삭제되었습니다.'] };
+        return { data: null, message: ['태그가 삭제되었습니다.'] };
     }
 };
 exports.TwosdayTagController = TwosdayTagController;
@@ -46,7 +47,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], TwosdayTagController.prototype, "getTags", null);
+], TwosdayTagController.prototype, "getAllTags", null);
 __decorate([
     (0, common_1.Post)('tag'),
     __param(0, (0, common_1.Body)('name', ParseString_pipe_1.ParseStringPipe)),

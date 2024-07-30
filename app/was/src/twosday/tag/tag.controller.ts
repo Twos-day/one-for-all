@@ -18,8 +18,9 @@ export class TwosdayTagController {
   constructor(private readonly tagService: TwosdayTagService) {}
 
   @Get('tag')
-  async getTags() {
-    return await this.tagService.getTags();
+  async getAllTags() {
+    const tags = await this.tagService.getAllTags();
+    return { data: tags, message: ['태그가 조회되었습니다.'] };
   }
 
   @Post('tag')
@@ -27,7 +28,7 @@ export class TwosdayTagController {
     const tagModel = await this.tagService.postTag(name);
     return {
       data: { id: tagModel.id, name: tagModel.name },
-      message: ['생성되었습니다.'],
+      message: ['태그가 생성되었습니다.'],
     };
   }
 
@@ -38,13 +39,13 @@ export class TwosdayTagController {
     @Body('name', ParseStringPipe) name: string,
   ) {
     await this.tagService.patchTag(id, name);
-    return { data: null, message: ['수정되었습니다.'] };
+    return { data: null, message: ['태그가 수정되었습니다.'] };
   }
 
   @Delete('tag/:id')
   @UseGuards(AccessGuard)
   async deleteTag(@Param('id', ParseIntPipe) id: number) {
     await this.tagService.deleteTag(id);
-    return { data: null, message: ['삭제되었습니다.'] };
+    return { data: null, message: ['태그가 삭제되었습니다.'] };
   }
 }

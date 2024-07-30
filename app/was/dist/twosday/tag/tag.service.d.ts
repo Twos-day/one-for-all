@@ -7,7 +7,7 @@ export declare class TwosdayTagService {
     private readonly configService;
     private readonly commonService;
     constructor(postsRepository: Repository<TwosdayTagModel>, configService: ConfigService, commonService: CommonService);
-    getTags(): Promise<TwosdayTagModel[]>;
+    getAllTags(): Promise<TwosdayTagModel[]>;
     postTag(tag: string): Promise<TwosdayTagModel>;
     patchTag(id: number, tag: string): Promise<import("typeorm").UpdateResult>;
     deleteTag(id: number): Promise<import("typeorm").DeleteResult>;

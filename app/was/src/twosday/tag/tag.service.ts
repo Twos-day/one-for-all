@@ -14,7 +14,7 @@ export class TwosdayTagService {
     private readonly commonService: CommonService,
   ) {}
 
-  async getTags() {
+  async getAllTags() {
     const tagModels = await this.postsRepository.find({
       order: { name: 'ASC' },
       select: ['id', 'name'],

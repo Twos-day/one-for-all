@@ -25,7 +25,7 @@ let TwosdayTagService = class TwosdayTagService {
         this.configService = configService;
         this.commonService = commonService;
     }
-    async getTags() {
+    async getAllTags() {
         const tagModels = await this.postsRepository.find({
             order: { name: 'ASC' },
             select: ['id', 'name'],
