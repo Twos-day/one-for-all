@@ -12,6 +12,6 @@ export class TwosdayReferenceModel extends BaseModel {
   @Column()
   thumbnail: string;
 
-  @Column()
+  @Column({ unique: true })
   url: string;
 }

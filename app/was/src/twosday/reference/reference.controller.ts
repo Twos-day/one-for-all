@@ -1,13 +1,17 @@
+import { AccessGuard } from '@/auth/guard/after-login.guard';
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   ParseIntPipe,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { TwosdayReferenceService } from './reference.service';
 import { CreateReferenceDto } from './dto/create-reference.dto';
+import { TwosdayReferenceService } from './reference.service';
 import { Info } from './type/info.type';
 
 @Controller('api/twosday')
@@ -28,6 +32,7 @@ export class TwosdayReferenceController {
   }
 
   @Post('reference')
+  @UseGuards(AccessGuard)
   async post(@Body() body: CreateReferenceDto) {
     const vid = this.referenceService.extractYoutubeVId(body.url);
 
@@ -41,6 +46,13 @@ export class TwosdayReferenceController {
 
     await this.referenceService.createReference(info);
 
-    return { message: ['레퍼런스가 저장되었습니다.'] };
+    return { data: null, message: ['레퍼런스가 저장되었습니다.'] };
+  }
+
+  @Delete('reference/:id')
+  @UseGuards(AccessGuard)
+  async delete(@Param('id', ParseIntPipe) id: number) {
+    await this.referenceService.deleteReference(id);
+    return { data: null, message: ['레퍼런스가 삭제되었습니다.'] };
   }
 }

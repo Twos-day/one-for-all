@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TwosdayReferenceModel } from './entities/reference.entity';
 import { google } from 'googleapis';
@@ -66,20 +71,33 @@ export class TwosdayReferenceService {
   }
 
   getReferences(page: number) {
-    const PAGE_SIZE = 10;
+    try {
+      const PAGE_SIZE = 10;
 
-    return this.referenceRepository.findAndCount({
-      select: [
-        'id',
-        'title',
-        'description',
-        'thumbnail',
-        'url',
-        'createdAt',
-        'updatedAt',
-      ],
-      skip: page < 2 ? 0 : (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-    });
+      return this.referenceRepository.findAndCount({
+        select: [
+          'id',
+          'title',
+          'description',
+          'thumbnail',
+          'url',
+          'createdAt',
+          'updatedAt',
+        ],
+        skip: page < 2 ? 0 : (page - 1) * PAGE_SIZE,
+        take: PAGE_SIZE,
+        order: { updatedAt: 'DESC' },
+      });
+    } catch (error) {
+      if (error.code === '23505') {
+        throw new ConflictException('이미 등록된 레퍼런스입니다.');
+      } else {
+        throw new InternalServerErrorException();
+      }
+    }
+  }
+
+  deleteReference(id: number) {
+    return this.referenceRepository.delete(id);
   }
 }

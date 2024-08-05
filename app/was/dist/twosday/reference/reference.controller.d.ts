@@ -1,5 +1,5 @@
-import { TwosdayReferenceService } from './reference.service';
 import { CreateReferenceDto } from './dto/create-reference.dto';
+import { TwosdayReferenceService } from './reference.service';
 export declare class TwosdayReferenceController {
     private readonly referenceService;
     constructor(referenceService: TwosdayReferenceService);
@@ -12,6 +12,11 @@ export declare class TwosdayReferenceController {
         };
     }>;
     post(body: CreateReferenceDto): Promise<{
+        data: any;
+        message: string[];
+    }>;
+    delete(id: number): Promise<{
+        data: any;
         message: string[];
     }>;
 }
