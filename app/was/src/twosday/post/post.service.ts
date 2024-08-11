@@ -20,17 +20,34 @@ export class TwosdayPostService {
     private readonly tagsService: TwosdayTagService,
   ) {}
 
-  async getAllPosts() {
-    return this.postsRepository.find({
+  async getAllPosts(page: number, size: number, order: 'popular' | 'recent') {
+    return this.postsRepository.findAndCount({
       relations: ['author', 'tags'],
       where: { isPublic: true },
       select: {
+        id: true,
+        title: true,
+        thumbnail: true,
+        viewCount: true,
+        updatedAt: true,
+        createdAt: true,
         author: {
-          email: true,
-          avatar: true,
+          id: true,
           nickname: true,
+          avatar: true,
+          email: true,
         },
-        deletedAt: false,
+        tags: {
+          id: true,
+          name: true,
+        },
+      },
+      // 페이지는 1보다 작을 수 없음
+      skip: page < 2 ? 0 : (page - 1) * size,
+      take: size,
+      order: {
+        viewCount: order === 'popular' ? 'DESC' : undefined, // 위 조건이 우선순위
+        updatedAt: 'DESC',
       },
     });
   }

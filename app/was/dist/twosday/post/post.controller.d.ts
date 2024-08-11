@@ -4,9 +4,11 @@ import { TwosdayPostService } from './post.service';
 export declare class TwosdayPostController {
     private readonly twosdayPostService;
     constructor(twosdayPostService: TwosdayPostService);
-    getAllPost(): Promise<{
+    getAllPost(order: 'popular' | 'recent', page: number, size: number): Promise<{
         data: {
-            posts: import("./entity/post.entity").TwosdayPostModel[];
+            post: import("./entity/post.entity").TwosdayPostModel[];
+            total: number;
+            size: number;
         };
         message: string[];
     }>;

@@ -60,25 +60,9 @@ let TwosdayReferenceService = class TwosdayReferenceService {
         return info;
     }
     async createReference(info) {
-        const reference = this.referenceRepository.create(info);
-        return this.referenceRepository.save(reference);
-    }
-    getReferences(page, size) {
         try {
-            return this.referenceRepository.findAndCount({
-                select: [
-                    'id',
-                    'title',
-                    'description',
-                    'thumbnail',
-                    'url',
-                    'createdAt',
-                    'updatedAt',
-                ],
-                skip: page < 2 ? 0 : (page - 1) * size,
-                take: size,
-                order: { updatedAt: 'DESC' },
-            });
+            const reference = this.referenceRepository.create(info);
+            return this.referenceRepository.save(reference);
         }
         catch (error) {
             if (error.code === '23505') {
@@ -88,6 +72,22 @@ let TwosdayReferenceService = class TwosdayReferenceService {
                 throw new common_1.InternalServerErrorException();
             }
         }
+    }
+    getReferences(page, size) {
+        return this.referenceRepository.findAndCount({
+            select: [
+                'id',
+                'title',
+                'description',
+                'thumbnail',
+                'url',
+                'createdAt',
+                'updatedAt',
+            ],
+            skip: page < 2 ? 0 : (page - 1) * size,
+            take: size,
+            order: { updatedAt: 'DESC' },
+        });
     }
     deleteReference(id) {
         return this.referenceRepository.delete(id);

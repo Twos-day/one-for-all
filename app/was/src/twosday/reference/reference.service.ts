@@ -66,27 +66,9 @@ export class TwosdayReferenceService {
   }
 
   async createReference(info: Info) {
-    const reference = this.referenceRepository.create(info);
-    return this.referenceRepository.save(reference);
-  }
-
-  getReferences(page: number, size: number) {
     try {
-      return this.referenceRepository.findAndCount({
-        select: [
-          'id',
-          'title',
-          'description',
-          'thumbnail',
-          'url',
-          'createdAt',
-          'updatedAt',
-        ],
-        // 페이지는 1보다 작을 수 없음
-        skip: page < 2 ? 0 : (page - 1) * size,
-        take: size,
-        order: { updatedAt: 'DESC' },
-      });
+      const reference = this.referenceRepository.create(info);
+      return this.referenceRepository.save(reference);
     } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('이미 등록된 레퍼런스입니다.');
@@ -94,6 +76,24 @@ export class TwosdayReferenceService {
         throw new InternalServerErrorException();
       }
     }
+  }
+
+  getReferences(page: number, size: number) {
+    return this.referenceRepository.findAndCount({
+      select: [
+        'id',
+        'title',
+        'description',
+        'thumbnail',
+        'url',
+        'createdAt',
+        'updatedAt',
+      ],
+      // 페이지는 1보다 작을 수 없음
+      skip: page < 2 ? 0 : (page - 1) * size,
+      take: size,
+      order: { updatedAt: 'DESC' },
+    });
   }
 
   deleteReference(id: number) {
