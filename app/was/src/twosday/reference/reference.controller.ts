@@ -19,14 +19,17 @@ export class TwosdayReferenceController {
   constructor(private readonly referenceService: TwosdayReferenceService) {}
 
   @Get('reference')
-  async get(@Query('page', ParseIntPipe) page: number) {
-    const [data, total] = await this.referenceService.getReferences(page);
+  async get(
+    @Query('page', ParseIntPipe) page: number,
+    @Query('size', ParseIntPipe) size: number,
+  ) {
+    const [data, total] = await this.referenceService.getReferences(page, size);
     return {
       message: ['레퍼런스가 조회되었습니다.'],
       data: {
         reference: data,
         total,
-        length: data.length,
+        size,
       },
     };
   }

@@ -63,9 +63,8 @@ let TwosdayReferenceService = class TwosdayReferenceService {
         const reference = this.referenceRepository.create(info);
         return this.referenceRepository.save(reference);
     }
-    getReferences(page) {
+    getReferences(page, size) {
         try {
-            const PAGE_SIZE = 10;
             return this.referenceRepository.findAndCount({
                 select: [
                     'id',
@@ -76,8 +75,8 @@ let TwosdayReferenceService = class TwosdayReferenceService {
                     'createdAt',
                     'updatedAt',
                 ],
-                skip: page < 2 ? 0 : (page - 1) * PAGE_SIZE,
-                take: PAGE_SIZE,
+                skip: page < 2 ? 0 : (page - 1) * size,
+                take: size,
                 order: { updatedAt: 'DESC' },
             });
         }

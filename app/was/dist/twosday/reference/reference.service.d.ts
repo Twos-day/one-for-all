@@ -14,6 +14,6 @@ export declare class TwosdayReferenceService {
     }>;
     crawlingUrl(url: string): Promise<Info>;
     createReference(info: Info): Promise<TwosdayReferenceModel>;
-    getReferences(page: number): Promise<[TwosdayReferenceModel[], number]>;
+    getReferences(page: number, size: number): Promise<[TwosdayReferenceModel[], number]>;
     deleteReference(id: number): Promise<import("typeorm").DeleteResult>;
 }

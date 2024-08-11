@@ -70,10 +70,8 @@ export class TwosdayReferenceService {
     return this.referenceRepository.save(reference);
   }
 
-  getReferences(page: number) {
+  getReferences(page: number, size: number) {
     try {
-      const PAGE_SIZE = 10;
-
       return this.referenceRepository.findAndCount({
         select: [
           'id',
@@ -84,8 +82,9 @@ export class TwosdayReferenceService {
           'createdAt',
           'updatedAt',
         ],
-        skip: page < 2 ? 0 : (page - 1) * PAGE_SIZE,
-        take: PAGE_SIZE,
+        // 페이지는 1보다 작을 수 없음
+        skip: page < 2 ? 0 : (page - 1) * size,
+        take: size,
         order: { updatedAt: 'DESC' },
       });
     } catch (error) {

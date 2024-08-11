@@ -3,12 +3,12 @@ import { TwosdayReferenceService } from './reference.service';
 export declare class TwosdayReferenceController {
     private readonly referenceService;
     constructor(referenceService: TwosdayReferenceService);
-    get(page: number): Promise<{
+    get(page: number, size: number): Promise<{
         message: string[];
         data: {
             reference: import("./entities/reference.entity").TwosdayReferenceModel[];
             total: number;
-            length: number;
+            size: number;
         };
     }>;
     post(body: CreateReferenceDto): Promise<{

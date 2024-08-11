@@ -21,14 +21,14 @@ let TwosdayReferenceController = class TwosdayReferenceController {
     constructor(referenceService) {
         this.referenceService = referenceService;
     }
-    async get(page) {
-        const [data, total] = await this.referenceService.getReferences(page);
+    async get(page, size) {
+        const [data, total] = await this.referenceService.getReferences(page, size);
         return {
             message: ['레퍼런스가 조회되었습니다.'],
             data: {
                 reference: data,
                 total,
-                length: data.length,
+                size,
             },
         };
     }
@@ -53,8 +53,9 @@ exports.TwosdayReferenceController = TwosdayReferenceController;
 __decorate([
     (0, common_1.Get)('reference'),
     __param(0, (0, common_1.Query)('page', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Query)('size', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Number]),
     __metadata("design:returntype", Promise)
 ], TwosdayReferenceController.prototype, "get", null);
 __decorate([
