@@ -8,21 +8,34 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { User } from 'src/user/decorator/user.decorator';
 import { PostDto } from './dto/post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { TwosdayPostService } from './post.service';
+import { PostOrderPipe } from './pipe/post-order.pipe';
 
 @Controller('api/twosday')
 export class TwosdayPostController {
   constructor(private readonly twosdayPostService: TwosdayPostService) {}
 
   @Get('post')
-  async getAllPost() {
-    const posts = await this.twosdayPostService.getAllPosts();
-    return { data: { posts }, message: ['게시글이 조회되었습니다.'] };
+  async getAllPost(
+    @Query('order', PostOrderPipe) order: 'popular' | 'recent',
+    @Query('page', ParseIntPipe) page: number,
+    @Query('size', ParseIntPipe) size: number,
+  ) {
+    const [data, total] = await this.twosdayPostService.getAllPosts(
+      page,
+      size,
+      order,
+    );
+    return {
+      data: { post: data, total, size },
+      message: ['게시글이 조회되었습니다.'],
+    };
   }
 
   @Get('post/:id')

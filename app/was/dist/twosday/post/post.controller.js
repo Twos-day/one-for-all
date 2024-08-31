@@ -19,13 +19,17 @@ const user_decorator_1 = require("../../user/decorator/user.decorator");
 const post_dto_1 = require("./dto/post.dto");
 const update_post_dto_1 = require("./dto/update-post.dto");
 const post_service_1 = require("./post.service");
+const post_order_pipe_1 = require("./pipe/post-order.pipe");
 let TwosdayPostController = class TwosdayPostController {
     constructor(twosdayPostService) {
         this.twosdayPostService = twosdayPostService;
     }
-    async getAllPost() {
-        const posts = await this.twosdayPostService.getAllPosts();
-        return { data: { posts }, message: ['게시글이 조회되었습니다.'] };
+    async getAllPost(order, page, size) {
+        const [data, total] = await this.twosdayPostService.getAllPosts(page, size, order);
+        return {
+            data: { post: data, total, size },
+            message: ['게시글이 조회되었습니다.'],
+        };
     }
     async getPostsById(id) {
         const post = await this.twosdayPostService.getPostById(id);
@@ -47,8 +51,11 @@ let TwosdayPostController = class TwosdayPostController {
 exports.TwosdayPostController = TwosdayPostController;
 __decorate([
     (0, common_1.Get)('post'),
+    __param(0, (0, common_1.Query)('order', post_order_pipe_1.PostOrderPipe)),
+    __param(1, (0, common_1.Query)('page', common_1.ParseIntPipe)),
+    __param(2, (0, common_1.Query)('size', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String, Number, Number]),
     __metadata("design:returntype", Promise)
 ], TwosdayPostController.prototype, "getAllPost", null);
 __decorate([

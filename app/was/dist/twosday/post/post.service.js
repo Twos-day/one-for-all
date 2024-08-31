@@ -25,17 +25,33 @@ let TwosdayPostService = class TwosdayPostService {
         this.commonService = commonService;
         this.tagsService = tagsService;
     }
-    async getAllPosts() {
-        return this.postsRepository.find({
+    async getAllPosts(page, size, order) {
+        return this.postsRepository.findAndCount({
             relations: ['author', 'tags'],
             where: { isPublic: true },
             select: {
+                id: true,
+                title: true,
+                thumbnail: true,
+                viewCount: true,
+                updatedAt: true,
+                createdAt: true,
                 author: {
-                    email: true,
-                    avatar: true,
+                    id: true,
                     nickname: true,
+                    avatar: true,
+                    email: true,
                 },
-                deletedAt: false,
+                tags: {
+                    id: true,
+                    name: true,
+                },
+            },
+            skip: page < 2 ? 0 : (page - 1) * size,
+            take: size,
+            order: {
+                viewCount: order === 'popular' ? 'DESC' : undefined,
+                updatedAt: 'DESC',
             },
         });
     }
@@ -55,11 +71,10 @@ let TwosdayPostService = class TwosdayPostService {
         return post;
     }
     async createPost(authorId, postDto) {
-        const tagsModel = await this.tagsService.getTags(postDto.tags);
         const post = this.postsRepository.create({
             author: { id: authorId },
             ...postDto,
-            tags: tagsModel,
+            tags: postDto.tags.map((tagId) => ({ id: tagId })),
         });
         const newPost = await this.postsRepository.save(post);
         return newPost;

@@ -60,11 +60,20 @@ let TwosdayReferenceService = class TwosdayReferenceService {
         return info;
     }
     async createReference(info) {
-        const reference = this.referenceRepository.create(info);
-        return this.referenceRepository.save(reference);
+        try {
+            const reference = this.referenceRepository.create(info);
+            return this.referenceRepository.save(reference);
+        }
+        catch (error) {
+            if (error.code === '23505') {
+                throw new common_1.ConflictException('이미 등록된 레퍼런스입니다.');
+            }
+            else {
+                throw new common_1.InternalServerErrorException();
+            }
+        }
     }
-    getReferences(page) {
-        const PAGE_SIZE = 10;
+    getReferences(page, size) {
         return this.referenceRepository.findAndCount({
             select: [
                 'id',
@@ -75,9 +84,13 @@ let TwosdayReferenceService = class TwosdayReferenceService {
                 'createdAt',
                 'updatedAt',
             ],
-            skip: page < 2 ? 0 : (page - 1) * PAGE_SIZE,
-            take: PAGE_SIZE,
+            skip: page < 2 ? 0 : (page - 1) * size,
+            take: size,
+            order: { updatedAt: 'DESC' },
         });
+    }
+    deleteReference(id) {
+        return this.referenceRepository.delete(id);
     }
 };
 exports.TwosdayReferenceService = TwosdayReferenceService;

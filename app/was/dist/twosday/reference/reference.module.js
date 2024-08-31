@@ -13,12 +13,19 @@ const typeorm_1 = require("@nestjs/typeorm");
 const reference_entity_1 = require("./entities/reference.entity");
 const reference_controller_1 = require("./reference.controller");
 const reference_service_1 = require("./reference.service");
+const auth_module_1 = require("../../auth/auth.module");
+const user_module_1 = require("../../user/user.module");
 let TwosdayReferenceModule = class TwosdayReferenceModule {
 };
 exports.TwosdayReferenceModule = TwosdayReferenceModule;
 exports.TwosdayReferenceModule = TwosdayReferenceModule = __decorate([
     (0, common_1.Module)({
-        imports: [common_module_1.CommonModule, typeorm_1.TypeOrmModule.forFeature([reference_entity_1.TwosdayReferenceModel])],
+        imports: [
+            common_module_1.CommonModule,
+            auth_module_1.AuthModule,
+            user_module_1.UserModule,
+            typeorm_1.TypeOrmModule.forFeature([reference_entity_1.TwosdayReferenceModel]),
+        ],
         controllers: [reference_controller_1.TwosdayReferenceController],
         providers: [reference_service_1.TwosdayReferenceService],
         exports: [reference_service_1.TwosdayReferenceService],

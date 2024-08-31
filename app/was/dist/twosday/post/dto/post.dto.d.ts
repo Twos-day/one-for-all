@@ -3,5 +3,5 @@ export declare class PostDto {
     thumbnail: string;
     content: string;
     isPublic: boolean;
-    tags: string[];
+    tags: number[];
 }

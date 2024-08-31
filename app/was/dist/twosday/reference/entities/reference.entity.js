@@ -28,7 +28,7 @@ __decorate([
     __metadata("design:type", String)
 ], TwosdayReferenceModel.prototype, "thumbnail", void 0);
 __decorate([
-    (0, typeorm_1.Column)(),
+    (0, typeorm_1.Column)({ unique: true }),
     __metadata("design:type", String)
 ], TwosdayReferenceModel.prototype, "url", void 0);
 exports.TwosdayReferenceModel = TwosdayReferenceModel = __decorate([

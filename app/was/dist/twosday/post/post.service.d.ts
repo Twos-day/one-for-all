@@ -9,7 +9,7 @@ export declare class TwosdayPostService {
     private readonly commonService;
     private readonly tagsService;
     constructor(postsRepository: Repository<TwosdayPostModel>, commonService: CommonService, tagsService: TwosdayTagService);
-    getAllPosts(): Promise<TwosdayPostModel[]>;
+    getAllPosts(page: number, size: number, order: 'popular' | 'recent'): Promise<[TwosdayPostModel[], number]>;
     getPostById(postId: number): Promise<TwosdayPostModel>;
     createPost(authorId: number, postDto: PostDto): Promise<TwosdayPostModel>;
     updatePost(postId: number, postDto: UpdatePostDto): Promise<TwosdayPostModel>;

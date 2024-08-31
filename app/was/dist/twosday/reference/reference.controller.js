@@ -13,21 +13,22 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TwosdayReferenceController = void 0;
+const after_login_guard_1 = require("../../auth/guard/after-login.guard");
 const common_1 = require("@nestjs/common");
-const reference_service_1 = require("./reference.service");
 const create_reference_dto_1 = require("./dto/create-reference.dto");
+const reference_service_1 = require("./reference.service");
 let TwosdayReferenceController = class TwosdayReferenceController {
     constructor(referenceService) {
         this.referenceService = referenceService;
     }
-    async get(page) {
-        const [data, total] = await this.referenceService.getReferences(page);
+    async get(page, size) {
+        const [data, total] = await this.referenceService.getReferences(page, size);
         return {
             message: ['레퍼런스가 조회되었습니다.'],
             data: {
                 reference: data,
                 total,
-                length: data.length,
+                size,
             },
         };
     }
@@ -41,24 +42,38 @@ let TwosdayReferenceController = class TwosdayReferenceController {
             info = await this.referenceService.crawlingUrl(body.url);
         }
         await this.referenceService.createReference(info);
-        return { message: ['레퍼런스가 저장되었습니다.'] };
+        return { data: null, message: ['레퍼런스가 저장되었습니다.'] };
+    }
+    async delete(id) {
+        await this.referenceService.deleteReference(id);
+        return { data: null, message: ['레퍼런스가 삭제되었습니다.'] };
     }
 };
 exports.TwosdayReferenceController = TwosdayReferenceController;
 __decorate([
     (0, common_1.Get)('reference'),
     __param(0, (0, common_1.Query)('page', common_1.ParseIntPipe)),
+    __param(1, (0, common_1.Query)('size', common_1.ParseIntPipe)),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Number]),
+    __metadata("design:paramtypes", [Number, Number]),
     __metadata("design:returntype", Promise)
 ], TwosdayReferenceController.prototype, "get", null);
 __decorate([
     (0, common_1.Post)('reference'),
+    (0, common_1.UseGuards)(after_login_guard_1.AccessGuard),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_reference_dto_1.CreateReferenceDto]),
     __metadata("design:returntype", Promise)
 ], TwosdayReferenceController.prototype, "post", null);
+__decorate([
+    (0, common_1.Delete)('reference/:id'),
+    (0, common_1.UseGuards)(after_login_guard_1.AccessGuard),
+    __param(0, (0, common_1.Param)('id', common_1.ParseIntPipe)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], TwosdayReferenceController.prototype, "delete", null);
 exports.TwosdayReferenceController = TwosdayReferenceController = __decorate([
     (0, common_1.Controller)('api/twosday'),
     __metadata("design:paramtypes", [reference_service_1.TwosdayReferenceService])
