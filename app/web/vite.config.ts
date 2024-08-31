@@ -12,7 +12,11 @@ export default defineConfig({
     vanillaExtractPlugin({
       identifiers: ({ hash }) => `css_${hash}`,
     }),
-    svgr(),
+    svgr({
+      svgrOptions: {
+        svgo: false,
+      },
+    }),
   ],
   build: {
     outDir: resolve(__dirname, "../was/public"),

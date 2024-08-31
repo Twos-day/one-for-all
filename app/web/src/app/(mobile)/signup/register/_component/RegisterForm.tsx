@@ -16,9 +16,10 @@ import { useNavigate } from "react-router-dom";
 
 interface RegisterFormProps {
   data: VerificationData;
+  onCompleted: () => void;
 }
 
-export default function RegisterForm({ data }: RegisterFormProps) {
+export default function RegisterForm({ data, onCompleted }: RegisterFormProps) {
   const navigate = useNavigate();
   const [nickname, setNickname] = useState("");
   const [password, setPassword] = useState("");
@@ -70,7 +71,7 @@ export default function RegisterForm({ data }: RegisterFormProps) {
     },
     onSuccess: (data) => {
       toast.success(data.message[0]);
-      navigate("/");
+      onCompleted();
     },
   });
 

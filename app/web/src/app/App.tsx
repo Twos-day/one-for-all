@@ -1,22 +1,21 @@
+import { lazyHelper } from "@/app/_lib/lazyHelper";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Notfound from "./notFound/page";
-import { signupRoute } from "./signup/route";
-import { loadPage } from "@/app/_lib/loadPage";
+import { mobileRoute } from "./(mobile)/route";
+import Notfound from "./not-found";
 import RootLayout from "./RootLayout";
-import { loginRoute } from "./login/route";
 
 const router = createBrowserRouter(
   [
     {
       path: "/",
       element: <RootLayout />,
+      errorElement: <div>400: error</div>,
       children: [
         {
           index: true,
-          lazy: () => loadPage(import("./home/page")),
+          lazy: () => lazyHelper(import("./home/page")),
         },
-        ...loginRoute,
-        ...signupRoute,
+        ...mobileRoute,
         {
           path: "*", // 404 Not Found
           element: <Notfound />,

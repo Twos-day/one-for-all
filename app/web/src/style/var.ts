@@ -43,6 +43,8 @@ export const zIndex = {
   },
 };
 
+export const MOBILE_MIN_WIDTH = 480;
+
 export const BREAK_POINT = {
   sm: 640,
   md: 768,
@@ -52,9 +54,11 @@ export const BREAK_POINT = {
   full: 1900,
 };
 
-type ResponsiveArgs = Partial<
-  Record<keyof typeof BREAK_POINT, CSSPropertiesWithVars>
->;
+export const VAR_COLOR = {
+  KAKAO: "#FEE500",
+};
+
+type ResponsiveArgs = Partial<Record<keyof typeof BREAK_POINT, CSSPropertiesWithVars>>;
 export const responsive = (styles: ResponsiveArgs) => {
   const mediaStyle: Record<string, CSSPropertiesWithVars> = {};
 
@@ -74,10 +78,7 @@ export const responsive = (styles: ResponsiveArgs) => {
   };
 };
 
-export const textLine = (
-  lineHeight: string | number,
-  clamp: number
-): CSSPropertiesWithVars => ({
+export const textLine = (lineHeight: string | number, clamp: number): CSSPropertiesWithVars => ({
   wordBreak: "break-all",
   display: "-webkit-box",
   overflow: "hidden",

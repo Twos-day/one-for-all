@@ -32,9 +32,8 @@ globalStyle("::-webkit-scrollbar-button", {
 });
 
 globalStyle("html, body", {
+  fontFamily: "Noto Sans KR, sans-serif",
   fontSize: 14, //root font size
-  minWidth: 1280,
-  minHeight: 720,
   letterSpacing: "-0.05em",
   margin: 0,
   padding: 0,
@@ -78,7 +77,7 @@ globalStyle(
     WebkitTextFillColor: "black",
     WebkitBoxShadow: "0 0 0 1000px #fff inset",
     boxShadow: "0 0 0 1000px #fff inset",
-  }
+  },
 );
 
 globalStyle("textarea", {

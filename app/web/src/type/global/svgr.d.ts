@@ -4,12 +4,6 @@ declare module "*.svg?react" {
 }
 
 declare module "*.svg?url" {
-  const svgUrl: {
-    src: string;
-    height: number;
-    width: number;
-    blurWidth: number;
-    blurHeight: number;
-  };
+  const svgUrl: string;
   export default svgUrl;
 }

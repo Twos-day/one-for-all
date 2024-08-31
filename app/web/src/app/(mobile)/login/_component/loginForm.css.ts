@@ -1,4 +1,4 @@
-import { flexCenter } from "@/style/var";
+import { flexCenter, VAR_COLOR } from "@/style/var";
 import { globalStyle, style } from "@vanilla-extract/css";
 import { globalVar } from "@/style/globalTheme.css";
 
@@ -76,12 +76,12 @@ export const AuthBtnWrap = style([
     width: "100%",
     height: 48,
     backgroundColor: "#fff",
-    borderRadius: 10,
+    borderRadius: 5,
     border: "1px solid #e1e2e4",
     selectors: {
       "&.kakao": {
-        backgroundColor: "#FEE500",
-        borderColor: "#FEE500",
+        backgroundColor: VAR_COLOR.KAKAO,
+        borderColor: VAR_COLOR.KAKAO,
       },
     },
   },
@@ -108,7 +108,7 @@ export const signUp = style({
 export const division = style({
   position: "absolute",
   top: 0,
-  left: 150,
+  left: "50%",
   transform: "translateY(-50%) translateX(-50%)",
   padding: "0px 12px",
   fontSize: 12,

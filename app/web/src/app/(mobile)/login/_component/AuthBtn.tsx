@@ -12,7 +12,7 @@ export default function AuthBtn({ icon, text, type, onClick }: AuthBtnProps) {
   return (
     <button
       type="button"
-      className={classNames(AuthBtnWrap, type === "kakao" ? "kakao" : "")}
+      className={classNames(AuthBtnWrap, { kakao: type === "kakao" })}
       onClick={onClick}
     >
       <span>{icon}</span>
