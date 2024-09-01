@@ -24,6 +24,11 @@ export class AppController {
     private readonly authService: AuthService,
   ) {}
 
+  @Get('/api')
+  async getApi() {
+    return { data: null, message: ['ok'] };
+  }
+
   @Get('/login')
   async getHello(
     @Req() req: Request,

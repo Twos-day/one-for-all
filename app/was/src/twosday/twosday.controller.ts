@@ -15,6 +15,6 @@ export class TwosdayController {
 
   @Get()
   hello() {
-    return { message: 'Hello, Twosday!' };
+    return { data: null, message: ['Hello, Twosday!'] };
   }
 }
