@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import * as layout from "../_component/mobileLayout.css";
+import * as layout from "../layout.css";
 import AuthBtnGrp from "./_component/AuthBtnGrp";
 
 export default function Page() {

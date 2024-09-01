@@ -1,5 +1,5 @@
 import Content from "./_component/Content";
-import * as layout from "../_component/mobileLayout.css";
+import * as layout from "../layout.css";
 
 export default function Page() {
   return (

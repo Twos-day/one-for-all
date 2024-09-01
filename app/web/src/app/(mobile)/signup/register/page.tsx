@@ -1,7 +1,7 @@
 import { Navigate, useSearchParams } from "react-router-dom";
 import { useQueryGetVerification } from "../_lib/signup";
 import RegisterForm from "./_component/RegisterForm";
-import * as layout from "../../_component/mobileLayout.css";
+import * as layout from "../../layout.css";
 import { useState } from "react";
 import Complete from "./_component/Complete";
 

@@ -3,8 +3,9 @@ import { style } from "@vanilla-extract/css";
 
 export const wrap = style([
   {
-    height: "100dvh",
     maxWidth: MOBILE_MIN_WIDTH,
+    height: "100%",
+    minHeight: "100dvh",
     margin: "0 auto",
     boxShadow: "0 0 30px 0 rgba(0, 0, 0, 0.05)",
     paddingTop: 62,

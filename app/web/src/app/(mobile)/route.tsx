@@ -1,6 +1,6 @@
 import { RouteObject } from "react-router-dom";
 import { lazyHelper } from "../_lib/lazyHelper";
-import MobileLayout from "./_component/MobileLayout";
+import MobileLayout from "./layout";
 
 export const mobileRoute: RouteObject[] = [
   {

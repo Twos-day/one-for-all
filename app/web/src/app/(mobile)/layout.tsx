@@ -1,5 +1,5 @@
 import { Outlet } from "react-router-dom";
-import * as css from "./mobileLayout.css";
+import * as css from "./layout.css";
 
 export default function MobileLayout() {
   return (
