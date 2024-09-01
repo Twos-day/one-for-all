@@ -14,12 +14,16 @@ async function bootstrap() {
 
   const options = new DocumentBuilder()
     .setTitle('One For All API Docs')
-    .setDescription('One For All API Docs')
+    .setDescription('<p>One For All API Docs</p><p>API 문서입니다.</p>')
+    .setExternalDoc('JSON-SCHEMA', '/docs/json')
     .setVersion('0.1.0')
     .build();
 
   const document = SwaggerModule.createDocument(app, options);
-  SwaggerModule.setup('docs', app, document);
+
+  SwaggerModule.setup('docs', app, document, {
+    jsonDocumentUrl: '/docs/json',
+  });
 
   // class validator dto 전역설정
   app.useGlobalPipes(
