@@ -17,6 +17,10 @@ const router = createBrowserRouter(
         },
         ...mobileRoute,
         {
+          path: "/typing",
+          lazy: () => lazyHelper(import("./typing/page")),
+        },
+        {
           path: "*", // 404 Not Found
           element: <Notfound />,
         },
