@@ -74,7 +74,7 @@ export class AppController {
       } catch (e) {
         // 세션이 만료됐을때
         // 리프레시 토큰 삭제
-        res.cookie('refreshToken', '', {
+        res.cookie(REFRESH_COOKIE_NAME, '', {
           maxAge: 0,
           domain: excuteRootDomain(url),
           path: '/',

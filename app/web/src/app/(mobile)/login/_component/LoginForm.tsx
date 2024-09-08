@@ -18,15 +18,7 @@ export default function LoginForm() {
   const mutateEmailLogin = useMutation({
     mutationFn: emailLoginFn,
     onMutate: () => setIsLoading(() => true),
-    onSuccess: ({ data }) => {
-      const hostname = new URL(window.location.href).hostname;
-      const domain = hostname.endsWith("twosday.live") ? "twosday.live" : "localhost";
-      const maxAge = 60 * 60 * 24 * 3; // 3일 (초단위)
-      let refreshCookie = `refreshToken=${data.token}; domain=${domain}; path=/; max-age=${maxAge};`;
-      if (domain !== "localhost") refreshCookie += " secure;";
-      document.cookie = refreshCookie;
-      window.location.href = "/login";
-    },
+    onSuccess: () => window.location.reload(), // 로그인 성공 시 페이지 리로드
     onError: async (error) => {
       await modalStore.push(ErrorModal, { props: { error } });
       setIsLoading(() => false);
