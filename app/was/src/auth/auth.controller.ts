@@ -1,5 +1,7 @@
+import { getServerUrl } from '@/common/util/getServerUrl';
 import { MailService } from '@/mail/mail.service';
 import { AccountType } from '@/user/const/account-type.const';
+import { StatusEnum } from '@/user/const/status.const';
 import { User } from '@/user/decorator/user.decorator';
 import { UserModel } from '@/user/entities/user.entity';
 import { UserService } from '@/user/user.service';
@@ -8,19 +10,20 @@ import {
   Controller,
   Delete,
   Get,
+  InternalServerErrorException,
   Logger,
   NotFoundException,
   Param,
   ParseIntPipe,
   Post,
   Req,
-  Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import * as bycrypt from 'bcrypt';
-import { Request, Response } from 'express';
+import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { GoogleUser } from './decorator/google-user.decorator';
 import { KakaoUser } from './decorator/kakao-user.decorator';
@@ -31,12 +34,17 @@ import {
 } from './dto/email-user.dto';
 import { SessionDto } from './dto/session.dto';
 import { PatchSocialUserDto, SocialUserDto } from './dto/social-user.dto';
+import { AccessGuard, SessoionUserGuard } from './guard/after-login.guard';
 import {
   BasicTokenGuard,
   SignupAccessGuard,
   SignupSessionGuard,
 } from './guard/before-login.guard';
-import { AccessGuard, SessoionUserGuard } from './guard/after-login.guard';
+import { excuteRootDomain } from './util/excute-root-domain';
+import {
+  getRefreshCookieOptions,
+  REFRESH_COOKIE_NAME,
+} from './const/tokens.const';
 
 @ApiTags('Auth')
 @Controller('api/auth')
@@ -51,22 +59,86 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   async googleAuth() {}
 
+  @Get('kakao')
+  @UseGuards(AuthGuard('kakao'))
+  async kakaoAuth() {}
+
+  async socialRoute(
+    req: Request,
+    socialUser: SocialUserDto,
+    accountType: AccountType,
+  ) {
+    let user = await this.userService.getUserByEmail(socialUser.email);
+
+    if (!user) {
+      // 유저가 없으면 새로 생성
+      user = await this.userService.registerUser(socialUser);
+    }
+    const serverUrl = getServerUrl();
+    const redirectUrl: string = req.cookies.redirect || serverUrl;
+
+    if (user.accountType && user.accountType !== accountType) {
+      // CASE - 1 : 이미 가입된 계정이 다른 소셜 계정으로 로그인 시도
+      const cause = `${accountType.toUpperCase()} 계정으로 가입된 사용자가 아닙니다.`;
+      return req.res.redirect(
+        `${serverUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+      );
+    }
+
+    if (user.status === StatusEnum.deactivated) {
+      // CASE - 2: 비활성화된 계정
+      const cause = '접근할 수 없는 계정입니다.';
+      return req.res.redirect(
+        `${serverUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
+      );
+    }
+
+    if (user.status === StatusEnum.unauthorized) {
+      // CASE - 3: 가입되지 않은 계정 회원가입 페이지 이동
+      // 가입전이라 db에 소셜계정 종류, 아바타, 닉네임이 아직 없기때문에
+      // callback으로 받은 소셜계정 종류, 아바타, 닉네임을 토큰에 추가해준다.
+      user.accountType = accountType;
+      user.avatar = socialUser.avatar;
+      user.nickname = socialUser.nickname;
+      const token = this.authService.signRefreshToken(user);
+      return req.res.redirect(`${serverUrl}/signup/register?token=${token}`);
+    }
+
+    if (
+      user.accountType === accountType &&
+      user.status === StatusEnum.activated
+    ) {
+      // CASE - 4: 로그인 처리
+      const refreshToken = this.authService.signRefreshToken(user);
+
+      // refresh 쿠키 저장
+      req.res.cookie(
+        REFRESH_COOKIE_NAME,
+        refreshToken,
+        getRefreshCookieOptions(),
+      );
+
+      // redirect 쿠키 삭제
+      req.res.cookie('redirect', '', {
+        maxAge: 0, // delete cookie
+        domain: excuteRootDomain(process.env.HOST),
+        path: '/',
+      });
+
+      return req.res.redirect(redirectUrl);
+    }
+
+    throw new InternalServerErrorException('관리자에게 문의하세요.');
+  }
+
   @Get('callback/google')
   @UseGuards(AuthGuard('google'))
   googleAuthRedirect(
     @GoogleUser() googleUser: SocialUserDto,
     @Req() req: Request,
   ) {
-    return this.authService.veryfySocialUser(
-      req,
-      googleUser,
-      AccountType.google,
-    );
+    return this.socialRoute(req, googleUser, AccountType.google);
   }
-
-  @Get('kakao')
-  @UseGuards(AuthGuard('kakao'))
-  async kakaoAuth() {}
 
   @Get('callback/kakao')
   @UseGuards(AuthGuard('kakao'))
@@ -74,7 +146,7 @@ export class AuthController {
     @KakaoUser() kakaoUser: SocialUserDto,
     @Req() req: Request,
   ) {
-    return this.authService.veryfySocialUser(req, kakaoUser, AccountType.kakao);
+    return this.socialRoute(req, kakaoUser, AccountType.kakao);
   }
 
   @Post('signup')
@@ -86,7 +158,20 @@ export class AuthController {
       user = await this.userService.registerUser(emailUser);
     }
 
-    this.authService.verifyEmailUser(user);
+    if (user.accountType && user.accountType !== AccountType.email) {
+      const cause = '이메일 계정으로 가입된 사용자가 아닙니다.';
+      throw new UnauthorizedException(cause);
+    }
+
+    if (user.status === StatusEnum.deactivated) {
+      const cause = '접근할 수 없는 계정입니다.';
+      throw new UnauthorizedException(cause);
+    }
+
+    if (user.status !== StatusEnum.unauthorized) {
+      throw new UnauthorizedException('이미 가입된 사용자입니다.');
+    }
+
     return {
       data: { id: user.id },
       message: ['사용자정보 추가등록을 진행합니다.'],
@@ -111,14 +196,14 @@ export class AuthController {
   async checkVerificationCode(@Body() dto: PostVerificationDto) {
     const user = await this.userService.checkVerificationCode(dto);
     user.accountType = AccountType.email; // 토큰에 계정타입 추가
-    const token = this.authService.generateRefreshToken(user);
+    const token = this.authService.signRefreshToken(user);
     return { data: { token }, message: ['인증번호가 확인되었습니다.'] };
   }
 
   @Get('verification')
   @UseGuards(SignupSessionGuard)
   async getVerification(@User() user: UserModel) {
-    const session = this.authService.createSession(user);
+    const session = this.authService.generateSessionDto(user);
     return { data: session, message: ['세션이 조회되었습니다.'] };
   }
 
@@ -140,8 +225,8 @@ export class AuthController {
       AccountType.email,
     );
 
-    const token = this.authService.generateRefreshToken(patchedUser);
-    this.authService.setRefreshToken(req.res, token);
+    const token = this.authService.signRefreshToken(patchedUser);
+    req.res.cookie(REFRESH_COOKIE_NAME, token, getRefreshCookieOptions());
     return { data: null, message: ['회원가입이 완료 되었습니다.'] };
   }
 
@@ -157,15 +242,15 @@ export class AuthController {
       dto,
       user.accountType,
     );
-    const token = this.authService.generateRefreshToken(patchedUser);
-    this.authService.setRefreshToken(req.res, token);
+    const token = this.authService.signRefreshToken(patchedUser);
+    req.res.cookie(REFRESH_COOKIE_NAME, token, getRefreshCookieOptions());
     return { data: null, message: ['회원가입이 완료 되었습니다.'] };
   }
 
   @UseGuards(BasicTokenGuard)
   @Post('email')
   async postLoginEmail(@User() user: UserModel) {
-    const token = this.authService.generateRefreshToken(user);
+    const token = this.authService.signRefreshToken(user);
     return { data: { token }, message: ['로그인 되었습니다.'] };
   }
 
@@ -181,7 +266,7 @@ export class AuthController {
   })
   @UseGuards(SessoionUserGuard)
   async getSession(@User() user: UserModel) {
-    const session = this.authService.createSession(user);
+    const session = this.authService.generateSessionDto(user);
     return { data: { session }, message: ['세션이 조회되었습니다.'] };
   }
 

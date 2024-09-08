@@ -2,28 +2,17 @@ import { AccountType } from '@/user/const/account-type.const';
 import { StatusEnum } from '@/user/const/status.const';
 import {
   BadRequestException,
-  ForbiddenException,
   Injectable,
-  InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bycrypt from 'bcrypt';
+import { Request } from 'express';
 import { UserModel } from 'src/user/entities/user.entity';
 import { UserService } from 'src/user/user.service';
-import { Request, Response } from 'express';
-import { excuteRootDomain } from './util/excute-root-domain';
-import { getServerUrl } from '@/common/util/getServerUrl';
+import { RefreshDto } from './dto/refresh.dto';
 import { SessionDto } from './dto/session.dto';
-import { SocialUserDto } from './dto/social-user.dto';
-
-type Payload = {
-  id: number;
-  email: string;
-  accountType: AccountType;
-  avatar?: string;
-  nickname?: string;
-};
 
 @Injectable()
 export class AuthService {
@@ -63,83 +52,7 @@ export class AuthService {
     return { email, password };
   }
 
-  async veryfySocialUser(
-    req: Request,
-    socialUser: SocialUserDto,
-    accountType: AccountType,
-  ): Promise<void> {
-    let user = await this.userService.getUserByEmail(socialUser.email);
-
-    if (!user) {
-      // 유저가 없으면 새로 생성
-      user = await this.userService.registerUser(socialUser);
-    }
-    const serverUrl = getServerUrl();
-    const redirectUrl: string = req.cookies.redirect || serverUrl;
-
-    if (user.accountType && user.accountType !== accountType) {
-      const cause = `${accountType.toUpperCase()} 계정으로 가입된 사용자가 아닙니다.`;
-      return req.res.redirect(
-        `${serverUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
-      );
-    }
-
-    if (user.status === StatusEnum.deactivated) {
-      const cause = '접근할 수 없는 계정입니다.';
-      return req.res.redirect(
-        `${serverUrl}/unAuthorized?cause=${encodeURIComponent(cause)}`,
-      );
-    }
-
-    if (user.status === StatusEnum.unauthorized) {
-      // 추가 정보 입력
-      // 토큰에 dto 추가
-      user.accountType = accountType;
-      user.avatar = socialUser.avatar;
-      user.nickname = socialUser.nickname;
-      const token = this.generateRefreshToken(user);
-      return req.res.redirect(`${serverUrl}/signup/register?token=${token}`);
-    }
-
-    if (
-      user.accountType === accountType &&
-      user.status === StatusEnum.activated
-    ) {
-      // 로그인 처리
-      const refreshToken = this.generateRefreshToken(user);
-      this.setRefreshToken(req.res, refreshToken);
-
-      req.res.cookie('redirect', '', {
-        maxAge: 0, // delete cookie
-        domain: excuteRootDomain(process.env.HOST),
-        path: '/',
-      });
-      return req.res.redirect(`${redirectUrl}`);
-    }
-
-    throw new InternalServerErrorException('관리자에게 문의하세요.');
-  }
-
-  verifyEmailUser(user: UserModel): void {
-    if (user.accountType && user.accountType !== AccountType.email) {
-      const cause = '이메일 계정으로 가입된 사용자가 아닙니다.';
-      throw new UnauthorizedException(cause);
-    }
-
-    if (user.status === StatusEnum.deactivated) {
-      const cause = '접근할 수 없는 계정입니다.';
-      throw new UnauthorizedException(cause);
-    }
-
-    if (user.status !== StatusEnum.unauthorized) {
-      throw new UnauthorizedException('이미 가입된 사용자입니다.');
-    }
-  }
-
-  async authenticateWithEmailAndPassword(payload: {
-    email: string;
-    password: string;
-  }) {
+  async authenticateEmailUser(payload: { email: string; password: string }) {
     const existingUser = await this.userService.getUserByEmail(payload.email);
 
     if (!existingUser || existingUser.status === StatusEnum.unauthorized) {
@@ -147,11 +60,11 @@ export class AuthService {
     }
 
     if (existingUser.status === StatusEnum.deactivated) {
-      throw new ForbiddenException('비활성화된 계정입니다.');
+      throw new UnauthorizedException('비활성화된 계정입니다.');
     }
 
     if (existingUser.accountType !== AccountType.email) {
-      throw new ForbiddenException('이메일로 회원가입된 계정이 아닙니다.');
+      throw new NotFoundException('이메일로 회원가입된 계정이 아닙니다.');
     }
 
     const isPass = await bycrypt.compare(
@@ -166,10 +79,14 @@ export class AuthService {
     return existingUser;
   }
 
-  /** true일시 refreshToken */
+  /*
+   * 토큰 복호화
+   * true - refreshToken,
+   * false - accessToken
+   */
   verifyToken(token: string, isRefresh: boolean) {
     try {
-      return this.jwrService.verify<Payload>(token, {
+      return this.jwrService.verify<RefreshDto>(token, {
         secret: isRefresh
           ? process.env.REFRESH_SECRET
           : process.env.ACCESS_SECRET,
@@ -179,8 +96,8 @@ export class AuthService {
     }
   }
 
-  generateRefreshToken(user: UserModel) {
-    const payload: Payload = {
+  signRefreshToken(user: UserModel) {
+    const payload: RefreshDto = {
       id: user.id,
       email: user.email,
       accountType: user.accountType,
@@ -190,22 +107,13 @@ export class AuthService {
 
     const refreshToken = this.jwrService.sign(payload, {
       secret: process.env.REFRESH_SECRET,
-      expiresIn: 60 * 60 * 24 * 3, //초단위
+      expiresIn: 60 * 60 * 24 * 3, //초단위 3일
     });
 
     return refreshToken;
   }
 
-  setRefreshToken(res: Response, token: string) {
-    res.cookie('refreshToken', token, {
-      domain: excuteRootDomain(process.env.HOST),
-      secure: process.env.PROTOCOL === 'https',
-      maxAge: 1000 * 60 * 60 * 24 * 3, // 3일 (밀리초)
-      path: '/',
-    });
-  }
-
-  createSession(user: UserModel) {
+  generateSessionDto(user: UserModel) {
     const session: SessionDto = {
       id: user.id,
       email: user.email,
@@ -220,7 +128,7 @@ export class AuthService {
 
     const accessToken = this.jwrService.sign(session, {
       secret: process.env.ACCESS_SECRET,
-      expiresIn: 60 * 60, //초단위
+      expiresIn: 60 * 60, //초단위 1시간
     });
 
     return { ...session, accessToken };

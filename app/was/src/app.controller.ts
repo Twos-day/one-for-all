@@ -15,6 +15,10 @@ import { AuthService } from './auth/auth.service';
 import { excuteRootDomain } from './auth/util/excute-root-domain';
 import { Url } from './common/decorator/url.decorator';
 import { getServerUrl } from './common/util/getServerUrl';
+import {
+  getRefreshCookieOptions,
+  REFRESH_COOKIE_NAME,
+} from './auth/const/tokens.const';
 
 @Controller()
 @UseInterceptors(CustomClassSerializerInterceptor)
@@ -53,7 +57,11 @@ export class AppController {
 
         this.authService.verifyToken(refreshCookie, true);
 
-        this.authService.setRefreshToken(res, refreshCookie);
+        res.cookie(
+          REFRESH_COOKIE_NAME,
+          refreshCookie,
+          getRefreshCookieOptions(),
+        );
 
         res.cookie('redirect', '', {
           domain: excuteRootDomain(url),
