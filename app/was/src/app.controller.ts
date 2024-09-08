@@ -45,7 +45,7 @@ export class AppController {
       ? redirect
       : getServerUrl();
 
-    const refreshCookie = req.cookies.refreshToken;
+    const refreshCookie = req.cookies[REFRESH_COOKIE_NAME];
     const redirectCookie = req.cookies.redirect;
 
     if (refreshCookie) {

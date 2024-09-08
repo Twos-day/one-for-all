@@ -18,7 +18,7 @@ export default function LoginForm() {
   const mutateEmailLogin = useMutation({
     mutationFn: emailLoginFn,
     onMutate: () => setIsLoading(() => true),
-    onSuccess: () => window.location.reload(), // 로그인 성공 시 페이지 리로드
+    onSuccess: () => (window.location.href = "/login"), // 로그인 성공 시 페이지 리로드
     onError: async (error) => {
       await modalStore.push(ErrorModal, { props: { error } });
       setIsLoading(() => false);

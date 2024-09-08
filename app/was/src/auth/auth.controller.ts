@@ -249,8 +249,9 @@ export class AuthController {
 
   @UseGuards(BasicTokenGuard)
   @Post('email')
-  async postLoginEmail(@User() user: UserModel) {
+  async postLoginEmail(@User() user: UserModel, @Req() req: Request) {
     const token = this.authService.signRefreshToken(user);
+    req.res.cookie(REFRESH_COOKIE_NAME, token, getRefreshCookieOptions());
     return { data: { token }, message: ['로그인 되었습니다.'] };
   }
 
