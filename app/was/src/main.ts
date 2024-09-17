@@ -7,10 +7,22 @@ import { urlencoded, json } from 'express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { LoggerMiddleware } from './log/logger.middleware';
+import * as basicAuth from 'express-basic-auth';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const { httpAdapter } = app.get(HttpAdapterHost);
+
+  app.use(
+    '/docs', // swagger 인증 설정 SwaggerModule.setup보다 먼저 선언해야함
+    basicAuth({
+      challenge: true,
+      users: {
+        // [username]: [password]
+        admin: 'Admin123@',
+      },
+    }),
+  );
 
   const options = new DocumentBuilder()
     .setTitle('One For All API Docs')
