@@ -255,6 +255,22 @@ export class AuthController {
     return { data: { token }, message: ['로그인 되었습니다.'] };
   }
 
+  /**
+   * 테스트 로그인
+   *
+   * 로컬호스트에서만 테스트 로그인 가능
+   */
+  @Post('email-test')
+  @UseGuards(BasicTokenGuard)
+  async testLogin(@User() user: UserModel, @Req() req: Request) {
+    const host = req.hostname;
+    if (host !== 'localhost') throw new NotFoundException();
+
+    const token = this.authService.signRefreshToken(user);
+    req.res.cookie(REFRESH_COOKIE_NAME, token, getRefreshCookieOptions());
+    return { data: { token }, message: ['로그인 되었습니다.'] };
+  }
+
   @Get('session')
   @ApiOperation({
     summary: '세션 조회',
