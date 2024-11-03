@@ -263,8 +263,8 @@ export class AuthController {
   @Post('email-test')
   @UseGuards(BasicTokenGuard)
   async testLogin(@User() user: UserModel, @Req() req: Request) {
-    const host = req.hostname;
-    if (host !== 'localhost') throw new NotFoundException();
+    const origin = excuteRootDomain(req.headers.origin);
+    if (origin !== 'localhost') throw new NotFoundException();
 
     const token = this.authService.signRefreshToken(user);
     req.res.cookie(REFRESH_COOKIE_NAME, token, getRefreshCookieOptions());
