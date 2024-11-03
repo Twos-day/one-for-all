@@ -12,4 +12,5 @@ export const getRefreshCookieOptions = () => ({
   secure: process.env.PROTOCOL === 'https',
   maxAge: 1000 * 60 * 60 * 24 * 3, // 3일 (밀리초)
   path: '/',
+  httpOnly: true,
 });

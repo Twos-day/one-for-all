@@ -267,7 +267,6 @@ export class AuthController {
     if (origin !== 'localhost') throw new NotFoundException();
 
     const token = this.authService.signRefreshToken(user);
-    req.res.cookie(REFRESH_COOKIE_NAME, token, getRefreshCookieOptions());
     return { data: { token }, message: ['로그인 되었습니다.'] };
   }
 
