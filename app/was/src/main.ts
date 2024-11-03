@@ -8,10 +8,63 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { LoggerMiddleware } from './log/logger.middleware';
 import * as basicAuth from 'express-basic-auth';
+import { ResponseTransformInterceptor } from './app.intercepter';
+
+function checkOrigin(origin: string | undefined): boolean {
+  if (!origin) return true; // 서버에서 시작하는 요청은 허용
+  const whitelist = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:8080',
+    'http://localhost:8081',
+    'https://twosday.live',
+  ];
+
+  return whitelist.some(
+    (allowedOrigin) =>
+      origin.startsWith(allowedOrigin) || origin.endsWith('.twosday.live'),
+  );
+}
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const { httpAdapter } = app.get(HttpAdapterHost);
+
+  // '/api' 경로로 들어오는 요청에 대한 전역 접두사 설정
+  // app.setGlobalPrefix('api');
+  app.useGlobalInterceptors(new ResponseTransformInterceptor());
+  app.useGlobalFilters(new AppFilter(httpAdapter), new HttpExceptionFilter());
+
+  // class validator dto 전역설정
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true, // 요청 데이터가 없을때 초기값으로 변환
+      transformOptions: {
+        enableImplicitConversion: true, // 요청데이터 타입변경
+      },
+      whitelist: true, // 요청 데이터에 없는 속성은 제거
+      forbidNonWhitelisted: true, // 요청 데이터에 없는 속성이 있을시 에러
+    }),
+  );
+
+  // cors 허용
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (checkOrigin(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    credentials: true,
+  });
+
+  app.use(json({ limit: '500mb' }));
+  app.use(urlencoded({ extended: true, limit: '500mb' }));
+  app.use(cookieParser());
+  // 디버깅용
+  app.use(new LoggerMiddleware().use);
 
   app.use(
     '/docs', // swagger 인증 설정 SwaggerModule.setup보다 먼저 선언해야함
@@ -36,58 +89,6 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document, {
     jsonDocumentUrl: '/docs/json',
   });
-
-  // class validator dto 전역설정
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true, // 요청 데이터가 없을때 초기값으로 변환
-      transformOptions: {
-        enableImplicitConversion: true, // 요청데이터 타입변경
-      },
-      whitelist: true, // 요청 데이터에 없는 속성은 제거
-      forbidNonWhitelisted: true, // 요청 데이터에 없는 속성이 있을시 에러
-    }),
-  );
-
-  // '/api' 경로로 들어오는 요청에 대한 전역 접두사 설정
-  // app.setGlobalPrefix('api');
-  app.useGlobalFilters(new AppFilter(httpAdapter), new HttpExceptionFilter());
-
-  app.use(json({ limit: '500mb' }));
-  app.use(urlencoded({ extended: true, limit: '500mb' }));
-  app.use(cookieParser());
-
-  function checkOrigin(origin: string | undefined): boolean {
-    if (!origin) return true; // 서버에서 시작하는 요청은 허용
-    const whitelist = [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:8080',
-      'http://localhost:8081',
-      'https://twosday.live',
-    ];
-
-    return whitelist.some(
-      (allowedOrigin) =>
-        origin.startsWith(allowedOrigin) || origin.endsWith('.twosday.live'),
-    );
-  }
-
-  // cors 허용
-  app.enableCors({
-    origin: (origin, callback) => {
-      if (checkOrigin(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    credentials: true,
-  });
-
-  // 디버깅용
-  app.use(new LoggerMiddleware().use);
 
   // app.enableShutdownHooks();
 
