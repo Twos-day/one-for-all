@@ -1,4 +1,4 @@
-import { lazyHelper } from "@/app/_lib/lazyHelper";
+import { lazyHelper } from "@/utils/lazyHelper";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { mobileRoute } from "./(mobile)/route";
 import Notfound from "./not-found";

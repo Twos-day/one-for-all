@@ -1,9 +1,9 @@
 import { Navigate, useSearchParams } from "react-router-dom";
-import { useQueryGetVerification } from "../_lib/signup";
-import RegisterForm from "./_component/RegisterForm";
+import { useQueryGetVerification } from "@/apis/signup";
+import RegisterForm from "@/components/register/RegisterForm";
 import * as layout from "../../layout.css";
 import { useState } from "react";
-import Complete from "./_component/Complete";
+import Complete from "@/components/register/Complete";
 
 interface PageProps {}
 

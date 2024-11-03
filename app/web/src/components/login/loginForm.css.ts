@@ -1,11 +1,11 @@
-import { flexCenter } from "@/styles/var";
+import { flexCenter, VAR_COLOR } from "@/styles/var";
 import { globalStyle, style } from "@vanilla-extract/css";
 import { globalVar } from "@/styles/globalTheme.css";
 
 export const form = style({
   display: "flex",
   flexDirection: "column",
-  gap: 20,
+  gap: 48,
 });
 
 export const inputWrap = style({
@@ -15,8 +15,17 @@ export const inputWrap = style({
   gap: 10,
 });
 
+export const top = style({
+  display: "flex",
+  flexDirection: "column",
+  gap: 30,
+});
+
+export const bottom = style({});
+
 export const label = style({
   width: 60,
+  color: "#70737C",
 });
 
 export const inputBox = style({
@@ -26,6 +35,9 @@ export const inputBox = style({
   backgroundColor: "transparent",
   padding: "0px 16px",
   height: 48,
+  ":focus-within": {
+    border: `1px solid ${globalVar.purpleDefault}`,
+  },
 });
 
 export const input = style({
@@ -42,19 +54,18 @@ export const btnBox = style([flexCenter]);
 export const loginBtn = style({
   width: "100%",
   height: 40,
-  backgroundColor: globalVar.blueDefault,
+  backgroundColor: globalVar.purpleDefault,
   padding: "7px 0",
   fontWeight: 600,
   fontSize: 16,
   color: "#fff",
-  boxShadow: "rgba(0, 0, 0, 0.1) 0px 1px 2px 0px",
-  borderRadius: 3,
+  borderRadius: 10,
   transition: "background-color 0.2s ease, color 0.2s ease",
   ":hover": {
-    backgroundColor: globalVar.blueHover,
+    backgroundColor: globalVar.purpleHover,
   },
   ":disabled": {
-    backgroundColor: globalVar.blueDisabled,
+    backgroundColor: globalVar.purpleDisabled,
   },
 });
 
@@ -65,12 +76,12 @@ export const AuthBtnWrap = style([
     width: "100%",
     height: 48,
     backgroundColor: "#fff",
-    borderRadius: 10,
+    borderRadius: 5,
     border: "1px solid #e1e2e4",
     selectors: {
       "&.kakao": {
-        backgroundColor: "#FEE500",
-        borderColor: "#FEE500",
+        backgroundColor: VAR_COLOR.KAKAO,
+        borderColor: VAR_COLOR.KAKAO,
       },
     },
   },
@@ -97,8 +108,23 @@ export const signUp = style({
 export const division = style({
   position: "absolute",
   top: 0,
-  left: 50,
+  left: "50%",
   transform: "translateY(-50%) translateX(-50%)",
   padding: "0px 12px",
-  color: "#70737C36",
+  fontSize: 12,
+  color: "#70737C",
+  backgroundColor: "#fff",
 });
+
+export const singUpBtn = style([
+  loginBtn,
+  {
+    border: "1px solid #70737C36",
+    backgroundColor: "#fff",
+    color: globalVar.purpleDefault,
+    ":hover": {
+      backgroundColor: "#fff ",
+      border: `1px solid ${globalVar.purpleDefault}`,
+    },
+  },
+]);

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import * as layout from "../layout.css";
-import AuthBtnGrp from "./_component/AuthBtnGrp";
+import AuthBtnGrp from "@/components/login/AuthBtnGrp";
 
 export default function Page() {
   const navigate = useNavigate();

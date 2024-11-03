@@ -1,6 +1,6 @@
 import { toast } from "sonner";
-import { useModalStore, useSetModalStore } from "../_lib/modalStore";
-import AlertModal from "../_component/modal/AlertModal";
+import { useModalStore, useSetModalStore } from "@/stores/modalStore";
+import AlertModal from "@/components/modal/AlertModal";
 
 export default function Home() {
   const modalStore = useSetModalStore();

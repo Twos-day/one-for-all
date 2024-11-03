@@ -1,9 +1,9 @@
 "use client";
-import Console from "./_component/Console";
-import Input from "./_component/Input";
-import LetterLine from "./_component/LetterLine";
-import Provider from "./_component/Provider";
-import { useTypingStore } from "./_lib/store";
+import Console from "@/components/typing/Console";
+import Input from "@/components/typing/Input";
+import LetterLine from "@/components/typing/LetterLine";
+import Provider from "@/components/typing/Provider";
+import { useTypingStore } from "@/stores/typing";
 
 const LETTERS_ARR = [
   "동해물과 백두산이 마르고 닳도록",

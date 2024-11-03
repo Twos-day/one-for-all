@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import * as layout from "../../layout.css";
-import LoginForm from "../_component/LoginForm";
+import LoginForm from "@/components/login/LoginForm";
 
 export default function Page() {
   const navigate = useNavigate();

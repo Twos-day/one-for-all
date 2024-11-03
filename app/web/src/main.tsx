@@ -1,5 +1,5 @@
-import "@/style/global.css";
-import "@/style/globalTheme.css";
+import "@/styles/global.css";
+import "@/styles/globalTheme.css";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "@/app/App";

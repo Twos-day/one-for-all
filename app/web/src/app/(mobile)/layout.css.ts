@@ -1,4 +1,4 @@
-import { MOBILE_MIN_WIDTH } from "@/style/var";
+import { MOBILE_MIN_WIDTH } from "@/styles/var";
 import { style } from "@vanilla-extract/css";
 
 export const wrap = style([

@@ -1,11 +1,11 @@
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { HelmetProvider } from "react-helmet-async";
 import { HotkeysProvider } from "react-hotkeys-hook";
-import ModalContainer from "./_component/modal/ModalContainer";
-import ReactQuery from "./_component/config/ReactQuery";
-import ToastBox from "./_component/config/ToastBox";
+import ModalContainer from "@/components/modal/ModalContainer";
+import ReactQuery from "@/components/config/ReactQuery";
+import ToastBox from "@/components/config/ToastBox";
 import { Outlet } from "react-router-dom";
-import App from "./_component/App";
+import App from "@/components/App";
 
 interface RootLayoutProps {}
 
