@@ -11,6 +11,7 @@ import { PostDto } from './dto/post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { TwosdayPostModel } from './entity/post.entity';
 import { ImageService } from '@/image/image.service';
+import { POST_SELECT_OPTIONS } from './post.const';
 
 @Injectable()
 export class TwosdayPostService {
@@ -20,31 +21,13 @@ export class TwosdayPostService {
     private readonly commonService: CommonService,
     private readonly imageService: ImageService,
     private readonly tagsService: TwosdayTagService,
-    private readonly dataSource: DataSource,
+    // private readonly dataSource: DataSource,
   ) {}
 
   async getAllPosts(page: number, size: number, order: 'popular' | 'recent') {
+    // TODO: 비공개 게시글 조회 api를 따로 만들어야 할지 고민
     return this.postsRepository.findAndCount({
-      relations: ['author', 'tags'],
-      where: { isPublic: true },
-      select: {
-        id: true,
-        title: true,
-        thumbnail: true,
-        viewCount: true,
-        updatedAt: true,
-        createdAt: true,
-        author: {
-          id: true,
-          nickname: true,
-          avatar: true,
-          email: true,
-        },
-        tags: {
-          id: true,
-          name: true,
-        },
-      },
+      ...POST_SELECT_OPTIONS,
       // 페이지는 1보다 작을 수 없음
       skip: page < 2 ? 0 : (page - 1) * size,
       take: size,
@@ -57,7 +40,7 @@ export class TwosdayPostService {
 
   async getPostById(postId: number) {
     const post = await this.postsRepository.findOne({
-      relations: ['author', 'tags'],
+      ...POST_SELECT_OPTIONS,
       where: { id: postId },
     });
 
@@ -65,9 +48,10 @@ export class TwosdayPostService {
       throw new NotFoundException();
     }
 
-    if (!post.isPublic) {
-      throw new ForbiddenException('접근 할 수 없는 게시글입니다.');
-    }
+    // TODO: 비공개 게시글 조회 api를 따로 만들어야 할지 고민
+    // if (!post.isPublic) {
+    //   throw new ForbiddenException('접근 할 수 없는 게시글입니다.');
+    // }
 
     await this.postsRepository.increment({ id: postId }, 'viewCount', 1);
 
