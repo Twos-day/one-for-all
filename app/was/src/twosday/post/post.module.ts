@@ -8,6 +8,7 @@ import { TwosdayPostModel } from './entity/post.entity';
 import { TwosdayPostController } from './post.controller';
 import { TwosdayPostService } from './post.service';
 import { TwosdayTagModule } from '../tag/tag.module';
+import { ImageModule } from '@/image/image.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TwosdayTagModule } from '../tag/tag.module';
     CommonModule,
     AwsModule,
     TwosdayTagModule,
+    ImageModule,
     TypeOrmModule.forFeature([TwosdayPostModel]),
   ],
   controllers: [TwosdayPostController],

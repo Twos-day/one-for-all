@@ -5,11 +5,12 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CommonService } from 'src/common/common.service';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { TwosdayTagService } from '../tag/tag.service';
 import { PostDto } from './dto/post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { TwosdayPostModel } from './entity/post.entity';
+import { ImageService } from '@/image/image.service';
 
 @Injectable()
 export class TwosdayPostService {
@@ -17,7 +18,9 @@ export class TwosdayPostService {
     @InjectRepository(TwosdayPostModel)
     private readonly postsRepository: Repository<TwosdayPostModel>,
     private readonly commonService: CommonService,
+    private readonly imageService: ImageService,
     private readonly tagsService: TwosdayTagService,
+    private readonly dataSource: DataSource,
   ) {}
 
   async getAllPosts(page: number, size: number, order: 'popular' | 'recent') {
@@ -73,14 +76,31 @@ export class TwosdayPostService {
   }
 
   async createPost(authorId: number, postDto: PostDto) {
+    // const qr = this.dataSource.createQueryRunner();
+    // await qr.connect();
+    // await qr.startTransaction();
+    // try {
+    const images = await Promise.all(
+      postDto.images.map((key) =>
+        this.imageService.saveImageUrl({ key, userId: authorId }),
+      ),
+    );
+
     const post = this.postsRepository.create({
-      author: { id: authorId },
       ...postDto,
+      author: { id: authorId },
       tags: postDto.tags.map((tagId) => ({ id: tagId })),
+      images,
     });
 
     const newPost = await this.postsRepository.save(post);
     return newPost;
+    //   await qr.commitTransaction();
+    //   await qr.release();
+    // } catch (e) {
+    //   await qr.rollbackTransaction();
+    //   await qr.release();
+    // }
   }
 
   async updatePost(postId: number, postDto: UpdatePostDto) {

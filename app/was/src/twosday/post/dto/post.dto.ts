@@ -25,4 +25,8 @@ export class PostDto {
   @IsArray()
   @IsNumber({}, { each: true })
   tags: number[];
+
+  @IsArray()
+  @IsString({ each: true })
+  images: string[];
 }

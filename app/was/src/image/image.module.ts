@@ -18,5 +18,6 @@ import { ImageModel } from './entity/image.entity';
   ],
   controllers: [ImageController],
   providers: [ImageService],
+  exports: [ImageService],
 })
 export class ImageModule {}

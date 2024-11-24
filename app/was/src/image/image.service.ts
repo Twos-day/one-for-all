@@ -19,4 +19,19 @@ export class ImageService {
     const image = this.imageRepository.create({ user, key });
     return await this.imageRepository.save(image);
   }
+
+  async saveImageUrl({ key, userId }: { userId: number; key: string }) {
+    const existImage = await this.imageRepository.findOne({ where: { key } });
+
+    if (!existImage) {
+      const newImage = this.imageRepository.create({
+        user: { id: userId },
+        key,
+      });
+
+      return this.imageRepository.save(newImage);
+    }
+
+    return existImage;
+  }
 }
